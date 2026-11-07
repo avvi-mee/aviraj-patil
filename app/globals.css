@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+/* Palette: paper, ink, graphite, line, and one accent: neel (indigo). */
+:root {
+  --paper: #fafaf8;
+  --paper-2: #f1f1ee;
+  --ink: #1b1d22;
+  --graphite: #5d6168;
+  --line: #e4e5e1;
+  --neel: #3d4bd9;
+  --neel-soft: #e6e8fb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0f1013;
+    --paper-2: #17191d;
+    --ink: #ecede9;
+    --graphite: #9a9ea6;
+    --line: #26292e;
+    --neel: #8f98ff;
+    --neel-soft: #1d2140;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-graphite: var(--graphite);
+  --color-line: var(--line);
+  --color-neel: var(--neel);
+  --color-neel-soft: var(--neel-soft);
+  --font-sans: var(--font-grotesk);
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-grotesk), system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--neel);
+  color: var(--paper);
+}
+
+:focus-visible {
+  outline: 2px solid var(--neel);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Type scale */
+.display {
+  font-size: clamp(4.75rem, 19vw, 12.5rem);
+  font-weight: 700;
+  letter-spacing: -0.06em;
+  line-height: 0.86;
+}
+.h2 {
+  font-size: clamp(2.25rem, 5.4vw, 4.25rem);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+.h3 {
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.lead {
+  font-size: clamp(1.125rem, 1.7vw, 1.375rem);
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 76rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+@media (min-width: 640px) {
+  .wrap {
+    padding-inline: 2.5rem;
+  }
+}
+
+/* Link underline that grows from the left on hover */
+.ulink {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  padding-bottom: 2px;
+}
+.ulink:hover,
+.ulink:focus-visible {
+  background-size: 100% 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
