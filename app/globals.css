@@ -4,20 +4,19 @@
    --accent is for shapes and fills; --accent-ink is the lighter shade used for small text. */
 :root {
   color-scheme: dark;
-  --paper: #000000;
-  --paper-2: #0c0c0e;
+  --paper: #1f1e1d;
+  --paper-2: #282725;
   --ink: #f2f2ef;
   --graphite: #9da0a8;
-  --line: #1d1e22;
+  --line: #33322f;
   --accent: #ff7a2f;
   --accent-ink: #ff9a5c;
-  --accent-soft: #2a1709;
+  --accent-soft: #3a2416;
   /* Frosted glass panels */
-  --glass-bg: rgb(255 255 255 / 0.045);
-  --glass-border: rgb(255 255 255 / 0.1);
-  --glass-hi: rgb(255 255 255 / 0.09);
-  --glass-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.85);
-  --aurora-o: 0.13;
+  --glass-bg: rgb(255 255 255 / 0.05);
+  --glass-border: rgb(255 255 255 / 0.09);
+  --glass-hi: rgb(255 255 255 / 0.1);
+  --glass-shadow: 0 24px 60px -28px rgb(0 0 0 / 0.6);
 }
 
 @theme inline {
@@ -155,55 +154,6 @@ html.lenis body {
   border: 1px solid var(--glass-border);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
-}
-
-/* Background light: three soft orange glows drifting slowly behind everything */
-.aurora {
-  position: absolute;
-  border-radius: 9999px;
-  opacity: var(--aurora-o);
-  filter: blur(80px);
-  will-change: transform;
-}
-.aurora-1 {
-  width: 52vmax;
-  height: 52vmax;
-  left: -14vmax;
-  top: -18vmax;
-  background: radial-gradient(circle, #f26419 0%, transparent 62%);
-  animation: drift-1 28s ease-in-out infinite alternate;
-}
-.aurora-2 {
-  width: 40vmax;
-  height: 40vmax;
-  right: -12vmax;
-  top: 18vh;
-  background: radial-gradient(circle, #ffad33 0%, transparent 62%);
-  animation: drift-2 34s ease-in-out infinite alternate;
-}
-.aurora-3 {
-  width: 46vmax;
-  height: 46vmax;
-  left: 22vw;
-  bottom: -26vmax;
-  background: radial-gradient(circle, #e2364f 0%, transparent 62%);
-  opacity: calc(var(--aurora-o) * 0.7);
-  animation: drift-3 40s ease-in-out infinite alternate;
-}
-@keyframes drift-1 {
-  to {
-    transform: translate(16vw, 18vh) scale(1.12);
-  }
-}
-@keyframes drift-2 {
-  to {
-    transform: translate(-20vw, 24vh) scale(0.9);
-  }
-}
-@keyframes drift-3 {
-  to {
-    transform: translate(-14vw, -16vh) scale(1.15);
-  }
 }
 
 /* Resume sheet: a real A4 page. Sizes are in cqw (percent of the sheet's width),

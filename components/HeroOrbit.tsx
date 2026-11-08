@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { projects, type Project } from "@/lib/projects";
+import { GithubIcon } from "./Icons";
 
 // The dot word in the middle (add more words here and it morphs between them).
 const WORDS = ["Portfolio"];
@@ -19,7 +20,33 @@ const ORBITS: Record<string, { ring: number; phase: number }> = {
   "interior-studio-os": { ring: 1, phase: 1.9 + Math.PI },
   "vasp-trace": { ring: 2, phase: 0.2 },
   "peer-review-arena": { ring: 2, phase: 0.2 + Math.PI },
+  github: { ring: 0, phase: 0.6 + Math.PI },
 };
+
+// Everything that orbits: the five projects, plus one planet that sends people to GitHub for the rest.
+type Planet = { key: string; name: string; context: string; line: string; href: string; external: boolean; cta: string; kind: Project["artifact"] | "github" };
+const PLANETS: Planet[] = [
+  ...projects.map((p) => ({
+    key: p.slug,
+    name: p.name,
+    context: p.context,
+    line: p.line,
+    href: `/work/${p.slug}`,
+    external: false,
+    cta: "Click to open the project",
+    kind: p.artifact,
+  })),
+  {
+    key: "github",
+    name: "More on GitHub",
+    context: "20+ more projects",
+    line: "Want to see more? A Hindi cartoon studio, a podcast-to-Shorts tool and plenty more are on my GitHub.",
+    href: "https://github.com/avvi-mee",
+    external: true,
+    cta: "Click to open my GitHub",
+    kind: "github",
+  },
+];
 
 const SPRING = 0.07;
 const FRICTION = 0.82;
@@ -29,10 +56,12 @@ const HOLD_MS = 2200; // how long a fully formed word stays before morphing
 type Dot = { x: number; y: number; hx: number; hy: number; vx: number; vy: number; accent: boolean; delay: number; sx: number; sy: number };
 
 // Small line icons, one per project.
-function PlanetIcon({ kind }: { kind: Project["artifact"] }) {
+function PlanetIcon({ kind }: { kind: Planet["kind"] }) {
   const s = { fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round" } as const;
   const a = "var(--accent)";
   switch (kind) {
+    case "github":
+      return <GithubIcon className="h-[46%] w-[46%]" />;
     case "katori":
       return (
         <svg viewBox="0 0 24 24" className="h-1/2 w-1/2" aria-hidden>
@@ -302,17 +331,17 @@ export default function HeroOrbit({ ready }: { ready: boolean }) {
       const cy = H / 2;
       const tilt = tiltFor(W);
       const size = Math.max(44, Math.min(74, W * 0.09));
-      projects.forEach((p, i) => {
+      PLANETS.forEach((p, i) => {
         const el = planetRefs.current[i];
         const label = labelRefs.current[i];
-        const o = ORBITS[p.slug];
+        const o = ORBITS[p.key];
         if (!el || !o) return;
         const pk = live ? Math.min(1, Math.max(0, (sinceReady - 500 - i * 140) / 1100)) : 0;
         const pl = 1 - Math.pow(1 - pk, 3);
         const R = RINGS[o.ring] * W * pl * (1 + s * 0.9);
         const a = o.phase + RING_SPEED[o.ring] * clock;
         const depth = (Math.sin(a) + 1) / 2;
-        const isHover = hoveredRef.current === p.slug;
+        const isHover = hoveredRef.current === p.key;
         const scale = (0.7 + 0.42 * depth) * (isHover ? 1.25 : 1) * (0.4 + 0.6 * pl);
         el.style.width = `${size}px`;
         el.style.height = `${size}px`;
@@ -401,65 +430,75 @@ export default function HeroOrbit({ ready }: { ready: boolean }) {
 
   return (
     <div ref={boxRef} className="relative mx-auto aspect-[1/0.88] w-full max-w-[min(92vw,860px,120svh)] min-[560px]:aspect-[1/0.56]">
-      {/* Soft warm light behind the word */}
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent opacity-[0.1] blur-3xl" />
       <canvas
         ref={canvasRef}
         aria-hidden
         className="pointer-events-none absolute inset-x-0 -top-1/4 z-10 h-[150%] w-full select-none font-sans"
       />
 
-      {projects.map((p, i) => (
-        <Link
-          key={p.slug}
-          href={`/work/${p.slug}`}
-          ref={(el) => {
+      {PLANETS.map((p, i) => {
+        const props = {
+          ref: (el: HTMLAnchorElement | null) => {
             planetRefs.current[i] = el;
-          }}
-          aria-label={`${p.name}: ${p.line}`}
-          onPointerEnter={(e) => e.pointerType === "mouse" && setHovered(p.slug)}
-          onPointerLeave={() => setHovered(null)}
-          onFocus={() => setHovered(p.slug)}
-          onBlur={() => setHovered(null)}
-          className={`glass absolute left-0 top-0 flex items-center justify-center rounded-full text-ink opacity-0 transition-[box-shadow] duration-300 will-change-transform ${
-            hovered === p.slug ? "shadow-[0_0_0_2px_var(--accent),0_0_40px_rgb(255_122_47/0.45)]" : ""
-          }`}
-        >
-          <PlanetIcon kind={p.artifact} />
-          <span
-            ref={(el) => {
-              labelRefs.current[i] = el;
-            }}
-            className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap opacity-0 transition-opacity duration-300"
-          >
+          },
+          "aria-label": `${p.name}: ${p.line}`,
+          onPointerEnter: (e: React.PointerEvent) => e.pointerType === "mouse" && setHovered(p.key),
+          onPointerLeave: () => setHovered(null),
+          onFocus: () => setHovered(p.key),
+          onBlur: () => setHovered(null),
+          // The GitHub planet gets an orange edge so it reads as "something different"
+          style: p.external ? { borderColor: "rgb(255 122 47 / 0.65)" } : undefined,
+          className: `glass absolute left-0 top-0 flex items-center justify-center rounded-full text-ink opacity-0 transition-[box-shadow] duration-300 will-change-transform ${
+            hovered === p.key ? "shadow-[0_0_0_2px_var(--accent),0_0_40px_rgb(255_122_47/0.45)]" : ""
+          }`,
+        };
+        const inner = (
+          <>
+            <PlanetIcon kind={p.kind} />
             <span
-              className={`inline-flex rounded-full border bg-[#0b0b0d] px-2.5 py-0.5 text-[0.7rem] font-semibold sm:text-[0.75rem] ${
-                hovered === p.slug ? "border-accent text-ink" : "border-[var(--glass-border)] text-graphite"
-              }`}
+              ref={(el) => {
+                labelRefs.current[i] = el;
+              }}
+              className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap opacity-0 transition-opacity duration-300"
             >
-              {p.name}
+              <span
+                className={`inline-flex rounded-full border bg-[#282725] px-2.5 py-0.5 text-[0.7rem] font-semibold sm:text-[0.75rem] ${
+                  hovered === p.key || p.external ? "border-accent text-ink" : "border-[var(--glass-border)] text-graphite"
+                }`}
+              >
+                {p.name}
+              </span>
             </span>
-          </span>
-        </Link>
-      ))}
+          </>
+        );
+        return p.external ? (
+          <a key={p.key} href={p.href} target="_blank" rel="noreferrer" {...props}>
+            {inner}
+          </a>
+        ) : (
+          <Link key={p.key} href={p.href} {...props}>
+            {inner}
+          </Link>
+        );
+      })}
 
       {/* Hover card: opaque so the text behind never shows through; placed beside the hovered planet */}
       <div
         ref={tipRef}
         aria-hidden
-        className={`pointer-events-none absolute left-0 top-0 z-50 w-[15rem] rounded-2xl border border-[var(--glass-border)] bg-[#0b0b0d]/95 p-4 text-left shadow-[0_24px_60px_-20px_rgb(0_0_0/0.9)] backdrop-blur-xl transition-opacity duration-200 ${
+        className={`pointer-events-none absolute left-0 top-0 z-50 w-[15rem] rounded-2xl border border-[var(--glass-border)] bg-[#282725]/95 p-4 text-left shadow-[0_24px_60px_-20px_rgb(0_0_0/0.9)] backdrop-blur-xl transition-opacity duration-200 ${
           hovered ? "opacity-100" : "opacity-0"
         }`}
       >
         {(() => {
-          const p = projects.find((x) => x.slug === hovered);
+          const p = PLANETS.find((x) => x.key === hovered);
           if (!p) return null;
           return (
             <>
               <p className="text-[0.75rem] text-graphite">{p.context}</p>
               <p className="mt-1 text-[1rem] font-semibold tracking-tight">{p.name}</p>
               <p className="mt-1.5 text-[0.8125rem] leading-snug text-[#d6d7d2]">{p.line}</p>
-              <p className="mt-3 text-[0.8125rem] font-semibold text-accent-ink">Click to open the project</p>
+              <p className="mt-3 text-[0.8125rem] font-semibold text-accent-ink">{p.cta}</p>
             </>
           );
         })()}

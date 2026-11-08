@@ -4,7 +4,6 @@ import "./globals.css";
 import SmoothScroll, { Motion } from "@/components/SmoothScroll";
 import Nav from "@/components/Nav";
 import Intro from "@/components/Intro";
-import Aurora from "@/components/Aurora";
 
 const grotesk = Schibsted_Grotesk({
   variable: "--font-grotesk",
@@ -24,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#1f1e1d",
   colorScheme: "dark",
 };
 
@@ -41,7 +40,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </noscript>
       </head>
       <body className="min-h-svh">
-        <Aurora />
         <Motion>
           <Intro />
           <SmoothScroll />

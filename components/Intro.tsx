@@ -38,7 +38,7 @@ export default function Intro() {
       id="intro"
       role="dialog"
       aria-label="Welcome"
-      className="fixed inset-0 z-[100] flex flex-col bg-[#0f1013] text-[#ecede9]"
+      className="fixed inset-0 z-[100] flex flex-col bg-[#1f1e1d] text-[#ecede9]"
       initial={{ y: 0 }}
       animate={leaving ? { y: "-100%" } : { y: 0 }}
       transition={{ duration: 1.05, ease: wipe }}
@@ -111,7 +111,7 @@ export default function Intro() {
         preserveAspectRatio="none"
       >
         <motion.path
-          fill="#0f1013"
+          fill="#1f1e1d"
           initial={{ d: "M0 0 L100 0 L100 0 Q50 0 0 0 Z" }}
           animate={{ d: leaving ? "M0 0 L100 0 L100 0 Q50 100 0 0 Z" : "M0 0 L100 0 L100 0 Q50 0 0 0 Z" }}
           transition={{ duration: 0.9, ease: wipe }}

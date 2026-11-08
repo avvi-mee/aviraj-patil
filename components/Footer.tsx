@@ -4,10 +4,6 @@ export default function Footer() {
   return (
     <footer id="contact" className="wrap mt-32 pb-10 sm:mt-48">
       <div className="glass relative overflow-hidden rounded-[2.5rem] px-6 py-14 sm:px-14 sm:py-20">
-        <span
-          aria-hidden
-          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent opacity-25 blur-3xl"
-        />
         <h2 className="h2 relative">Get in touch</h2>
         <p className="lead relative mt-5 max-w-[42ch] text-graphite">
           Building something, want to work with UNMATRIX, or just want to talk tech? Reach me directly.

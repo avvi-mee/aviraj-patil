@@ -15,14 +15,9 @@ export default function Hero() {
   });
 
   return (
-    <section className="relative flex min-h-svh flex-col items-center justify-center overflow-x-clip px-4 pb-24 pt-28 text-center">
-      <motion.p className="glass relative z-10 flex items-center gap-2.5 rounded-full px-4 py-2 text-[0.875rem] text-graphite" {...rise(0.2)}>
-        <span className="h-2 w-2 rounded-full bg-accent" aria-hidden />
-        B.Tech CSE (AI &amp; ML) student in Pune
-      </motion.p>
-
+    <section className="relative flex min-h-svh flex-col items-center justify-center overflow-x-clip px-4 pb-16 pt-24 text-center">
       <h1 className="sr-only">Hi, I&apos;m Aviraj Patil</h1>
-      <div className="mt-4 w-full sm:mt-2">
+      <div className="w-full">
         <HeroOrbit ready={ready} />
       </div>
 
@@ -49,22 +44,6 @@ export default function Hero() {
         <span className="hidden sm:inline">Hover a planet to pause the orbit, click to open the project</span>
         <span className="sm:hidden">Tap a planet to open the project</span>
       </motion.p>
-
-      {/* Scroll cue: a small glass capsule with a dot sliding down */}
-      <motion.a
-        href="#work"
-        aria-label="Scroll to projects"
-        className="glass absolute bottom-8 left-1/2 hidden h-11 w-7 -translate-x-1/2 justify-center rounded-full pt-2 sm:flex"
-        initial={{ opacity: 0 }}
-        animate={ready ? { opacity: 1 } : {}}
-        transition={{ delay: 1.6, duration: 1 }}
-      >
-        <motion.span
-          className="h-2 w-1 rounded-full bg-accent"
-          animate={{ y: [0, 14, 0], opacity: [1, 0.2, 1] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </motion.a>
     </section>
   );
 }
