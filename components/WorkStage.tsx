@@ -5,24 +5,41 @@ import { useRef, useState } from "react";
 import { AnimatePresence, motion, useInView, useMotionValueEvent, useScroll, useSpring } from "motion/react";
 import { projects, type Project } from "@/lib/projects";
 import Artifact from "./Artifacts";
+import { GithubIcon } from "./Icons";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
+const pill =
+  "inline-flex h-10 items-center gap-2 rounded-full px-4 text-[0.875rem] font-semibold transition-transform duration-300 hover:-translate-y-0.5";
+
 function Links({ p }: { p: Project }) {
   return (
-    <div className="flex flex-wrap gap-x-6 gap-y-2 text-[0.9375rem] font-medium">
-      <Link href={`/work/${p.slug}`} className="ulink text-accent-ink">
+    <div className="flex flex-wrap gap-2.5">
+      <Link href={`/work/${p.slug}`} className={`${pill} bg-accent text-[#1b1d22]`}>
         Read the case study
       </Link>
       {p.live && (
-        <a href={p.live.href} target="_blank" rel="noreferrer" className="ulink">
-          {p.live.label}
+        <a href={p.live.href} target="_blank" rel="noreferrer" className={`${pill} glass`}>
+          Live demo
         </a>
       )}
-      <a href={p.github} target="_blank" rel="noreferrer" className="ulink text-graphite hover:text-ink">
-        Code on GitHub
+      <a href={p.github} target="_blank" rel="noreferrer" className={`${pill} glass`}>
+        <GithubIcon className="h-4 w-4" />
+        Code
       </a>
     </div>
+  );
+}
+
+function Stack({ p }: { p: Project }) {
+  return (
+    <ul className="flex flex-wrap gap-2" aria-label="Built with">
+      {p.stack.map((s) => (
+        <li key={s} className="chip text-graphite">
+          {s}
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -78,7 +95,7 @@ function Pinned() {
               ))}
             </ul>
 
-            <div className="relative min-h-[23rem]">
+            <div className="relative min-h-[26rem]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={p.slug}
@@ -92,7 +109,9 @@ function Pinned() {
                     {p.name}
                   </h3>
                   <p className="lead mt-5 max-w-[30ch]">{p.line}</p>
-                  <p className="mt-4 text-[0.9375rem] text-graphite">Built with {p.stack.join(", ")}</p>
+                  <div className="mt-6">
+                    <Stack p={p} />
+                  </div>
                   <div className="mt-8">
                     <Links p={p} />
                   </div>
@@ -102,7 +121,7 @@ function Pinned() {
           </div>
 
           <div className="col-span-7">
-            <div className="relative mx-auto aspect-square max-h-[76svh] overflow-hidden rounded-[2.5rem] bg-paper-2">
+            <div className="glass relative mx-auto aspect-square max-h-[76svh] overflow-hidden rounded-[2.5rem]">
               {projects.map((x, i) => (
                 <motion.div
                   key={x.slug}
@@ -134,15 +153,19 @@ function MobileCard({ p }: { p: Project }) {
   const ref = useRef<HTMLDivElement>(null);
   const seen = useInView(ref, { amount: 0.5 });
   return (
-    <article className="py-10">
-      <div ref={ref} className="aspect-square overflow-hidden rounded-[2rem] bg-paper-2 p-[8%]">
+    <article className="glass rounded-[2rem] p-4 pb-6">
+      <div ref={ref} className="aspect-square overflow-hidden rounded-[1.5rem] bg-[var(--glass-bg)] p-[8%]">
         <Artifact kind={p.artifact} play={seen} />
       </div>
-      <p className="mt-6 text-[0.9375rem] text-graphite">{p.context}</p>
-      <h3 className="h3 mt-2">{p.name}</h3>
-      <p className="mt-3 text-lg leading-relaxed">{p.line}</p>
-      <p className="mt-3 text-[0.9375rem] text-graphite">Built with {p.stack.join(", ")}</p>
-      <div className="mt-5">
+      <div className="px-2">
+        <p className="mt-6 text-[0.9375rem] text-graphite">{p.context}</p>
+        <h3 className="h3 mt-2">{p.name}</h3>
+        <p className="mt-3 text-lg leading-relaxed">{p.line}</p>
+        <div className="mt-4">
+          <Stack p={p} />
+        </div>
+      </div>
+      <div className="mt-6 px-2">
         <Links p={p} />
       </div>
     </article>
@@ -153,7 +176,7 @@ export default function WorkStage() {
   return (
     <>
       <Pinned />
-      <div className="wrap divide-y divide-line lg:hidden">
+      <div className="wrap mt-10 space-y-5 lg:hidden">
         {projects.map((p) => (
           <MobileCard key={p.slug} p={p} />
         ))}

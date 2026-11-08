@@ -11,6 +11,12 @@
   --accent: #f26419;
   --accent-ink: #c2480c;
   --accent-soft: #fde6d8;
+  /* Frosted glass panels */
+  --glass-bg: rgb(255 255 255 / 0.55);
+  --glass-border: rgb(27 29 34 / 0.08);
+  --glass-hi: rgb(255 255 255 / 0.75);
+  --glass-shadow: 0 24px 60px -28px rgb(80 40 10 / 0.25);
+  --aurora-o: 0.32;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,6 +29,11 @@
     --accent: #ff7a2f;
     --accent-ink: #ff9a5c;
     --accent-soft: #2e1c12;
+    --glass-bg: rgb(255 255 255 / 0.045);
+    --glass-border: rgb(255 255 255 / 0.09);
+    --glass-hi: rgb(255 255 255 / 0.07);
+    --glass-shadow: 0 30px 70px -30px rgb(0 0 0 / 0.6);
+    --aurora-o: 0.5;
   }
 }
 
@@ -45,7 +56,6 @@ html {
 }
 
 body {
-  background: var(--paper);
   color: var(--ink);
   font-family: var(--font-grotesk), system-ui, sans-serif;
   text-rendering: optimizeLegibility;
@@ -139,5 +149,75 @@ html.lenis body {
   *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+  }
+}
+
+/* Glass: frosted panel with a thin light edge on top */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
+  box-shadow: inset 0 1px 0 var(--glass-hi), var(--glass-shadow);
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* Background light: three soft orange glows drifting slowly behind everything */
+.aurora {
+  position: absolute;
+  border-radius: 9999px;
+  opacity: var(--aurora-o);
+  filter: blur(80px);
+  will-change: transform;
+}
+.aurora-1 {
+  width: 52vmax;
+  height: 52vmax;
+  left: -14vmax;
+  top: -18vmax;
+  background: radial-gradient(circle, #f26419 0%, transparent 62%);
+  animation: drift-1 28s ease-in-out infinite alternate;
+}
+.aurora-2 {
+  width: 40vmax;
+  height: 40vmax;
+  right: -12vmax;
+  top: 18vh;
+  background: radial-gradient(circle, #ffad33 0%, transparent 62%);
+  animation: drift-2 34s ease-in-out infinite alternate;
+}
+.aurora-3 {
+  width: 46vmax;
+  height: 46vmax;
+  left: 22vw;
+  bottom: -26vmax;
+  background: radial-gradient(circle, #e2364f 0%, transparent 62%);
+  opacity: calc(var(--aurora-o) * 0.7);
+  animation: drift-3 40s ease-in-out infinite alternate;
+}
+@keyframes drift-1 {
+  to {
+    transform: translate(16vw, 18vh) scale(1.12);
+  }
+}
+@keyframes drift-2 {
+  to {
+    transform: translate(-20vw, 24vh) scale(0.9);
+  }
+}
+@keyframes drift-3 {
+  to {
+    transform: translate(-14vw, -16vh) scale(1.15);
   }
 }

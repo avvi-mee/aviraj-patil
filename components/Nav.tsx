@@ -1,46 +1,69 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { motion, useMotionValueEvent, useScroll } from "motion/react";
+import { motion } from "motion/react";
 import { useIntroDone } from "@/lib/intro";
+import { DownloadIcon, socials } from "./Icons";
 
+const sections = [
+  { label: "Projects", href: "/#work" },
+  { label: "Skills", href: "/#skills" },
+  { label: "About", href: "/#about" },
+];
+
+// Floating glass bar: name, sections, social icons and the resume button.
 export default function Nav() {
-  const { scrollY } = useScroll();
-  const [solid, setSolid] = useState(false);
   const ready = useIntroDone();
-  useMotionValueEvent(scrollY, "change", (y) => setSolid(y > 24));
 
   return (
     <motion.header
-      initial={{ opacity: 0, y: -10 }}
+      initial={{ opacity: 0, y: -16 }}
       animate={ready ? { opacity: 1, y: 0 } : {}}
       transition={{ delay: 0.6, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color] duration-500 ${
-        solid ? "border-line bg-paper/80 backdrop-blur-xl" : "border-transparent bg-transparent"
-      }`}
+      className="fixed inset-x-0 top-3 z-50 px-3 sm:top-4 sm:px-6"
     >
-      <nav aria-label="Main" className="wrap flex h-14 items-center justify-between text-[0.9375rem]">
-        <Link href="/" className="font-semibold tracking-tight">
+      <nav
+        aria-label="Main"
+        className="glass mx-auto flex h-14 max-w-[72rem] items-center justify-between gap-3 rounded-full pl-5 pr-2"
+      >
+        <Link href="/" className="shrink-0 text-[0.9375rem] font-semibold tracking-tight">
           Aviraj Patil
         </Link>
-        <ul className="flex items-center gap-5 text-graphite sm:gap-7">
-          <li>
-            <Link href="/#work" className="ulink transition-colors hover:text-ink">
-              Projects
-            </Link>
-          </li>
-          <li>
-            <Link href="/#about" className="ulink transition-colors hover:text-ink">
-              About
-            </Link>
-          </li>
-          <li>
-            <a href="/aviraj-patil-resume.pdf" download className="ulink transition-colors hover:text-ink">
-              Resume
-            </a>
-          </li>
+
+        <ul className="hidden items-center gap-7 text-[0.9375rem] text-graphite md:flex">
+          {sections.map((s) => (
+            <li key={s.label}>
+              <Link href={s.href} className="ulink transition-colors hover:text-ink">
+                {s.label}
+              </Link>
+            </li>
+          ))}
         </ul>
+
+        <div className="flex items-center gap-0.5">
+          {socials.map(({ label, href, Icon, external }, i) => (
+            <a
+              key={label}
+              href={href}
+              aria-label={label}
+              title={label}
+              {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+              className={`h-10 w-10 items-center justify-center rounded-full text-graphite transition-colors duration-300 hover:bg-[var(--glass-bg)] hover:text-ink ${
+                i > 1 ? "hidden sm:flex" : "flex"
+              }`}
+            >
+              <Icon />
+            </a>
+          ))}
+          <a
+            href="/aviraj-patil-resume.pdf"
+            download
+            className="ml-1.5 inline-flex h-10 items-center gap-2 rounded-full bg-accent px-4 text-[0.875rem] font-semibold text-[#1b1d22] transition-transform duration-300 hover:scale-[1.04] active:scale-[0.97]"
+          >
+            Resume
+            <DownloadIcon />
+          </a>
+        </div>
       </nav>
     </motion.header>
   );

@@ -48,8 +48,8 @@ function Tile({
       <Link
         href={`/work/${p.slug}`}
         aria-label={`${p.name}: ${p.line}`}
-        className={`group absolute inset-0 overflow-hidden rounded-[1.5rem] bg-paper-2 outline-offset-4 transition-[box-shadow] duration-700 sm:rounded-[1.75rem] ${
-          active ? "shadow-[0_0_0_2px_var(--accent)]" : "shadow-[0_0_0_1px_var(--line)]"
+        className={`glass group absolute inset-0 overflow-hidden rounded-[1.5rem] outline-2 -outline-offset-1 transition-[outline-color] duration-700 sm:rounded-[1.75rem] ${
+          active ? "outline outline-accent" : "outline outline-transparent"
         }`}
       >
         <div className="absolute inset-0 p-[9%] transition-transform duration-700 ease-out group-hover:scale-[1.04]">

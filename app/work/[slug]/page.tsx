@@ -5,6 +5,7 @@ import { getProject, projects } from "@/lib/projects";
 import SplitReveal from "@/components/SplitReveal";
 import InViewArtifact from "@/components/InViewArtifact";
 import Footer from "@/components/Footer";
+import { GithubIcon } from "@/components/Icons";
 
 export function generateStaticParams() {
   return projects.map((p) => ({ slug: p.slug }));
@@ -37,44 +38,48 @@ export default async function WorkPage(props: PageProps<"/work/[slug]">) {
           </h1>
           <p className="lead mt-8 max-w-[34ch]">{p.line}</p>
 
-          <dl className="mt-12 grid gap-6 border-t border-line pt-6 text-[0.9375rem] sm:grid-cols-3">
-            <div>
-              <dt className="text-graphite">Built with</dt>
-              <dd className="mt-1">{p.stack.join(", ")}</dd>
-            </div>
-            <div>
-              <dt className="text-graphite">Code</dt>
-              <dd className="mt-1">
-                <a href={p.github} target="_blank" rel="noreferrer" className="ulink">
-                  View on GitHub
-                </a>
-              </dd>
-            </div>
+          <ul className="mt-10 flex flex-wrap gap-2" aria-label="Built with">
+            {p.stack.map((s) => (
+              <li key={s} className="chip text-graphite">
+                {s}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-8 flex flex-wrap gap-2.5">
             {p.live && (
-              <div>
-                <dt className="text-graphite">Try it</dt>
-                <dd className="mt-1">
-                  <a href={p.live.href} target="_blank" rel="noreferrer" className="ulink text-accent-ink">
-                    {p.live.label}
-                  </a>
-                </dd>
-              </div>
+              <a
+                href={p.live.href}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex h-11 items-center rounded-full bg-accent px-5 text-[0.875rem] font-semibold text-[#1b1d22] transition-transform duration-300 hover:-translate-y-0.5"
+              >
+                {p.live.label}
+              </a>
             )}
-          </dl>
+            <a
+              href={p.github}
+              target="_blank"
+              rel="noreferrer"
+              className="glass inline-flex h-11 items-center gap-2 rounded-full px-5 text-[0.875rem] font-semibold transition-transform duration-300 hover:-translate-y-0.5"
+            >
+              <GithubIcon className="h-4 w-4" />
+              View the code
+            </a>
+          </div>
         </header>
 
         <div className="wrap mt-16">
-          <div className="rounded-[2.5rem] bg-paper-2">
+          <div className="glass rounded-[2.5rem]">
             <InViewArtifact kind={p.artifact} />
           </div>
         </div>
 
-        <div className="wrap mt-24 space-y-20 sm:mt-32 sm:space-y-28">
-          <section className="grid gap-6 md:grid-cols-12">
+        <div className="wrap mt-16 space-y-4 sm:mt-20">
+          <section className="glass grid gap-6 rounded-[2rem] p-6 sm:p-10 md:grid-cols-12">
             <h2 className="h3 md:col-span-4">The problem</h2>
             <p className="max-w-[60ch] text-lg leading-relaxed text-graphite md:col-span-8">{p.problem}</p>
           </section>
-          <section className="grid gap-6 md:grid-cols-12">
+          <section className="glass grid gap-6 rounded-[2rem] p-6 sm:p-10 md:grid-cols-12">
             <h2 className="h3 md:col-span-4">What I built</h2>
             <ul className="max-w-[60ch] space-y-4 md:col-span-8">
               {p.built.map((b) => (
@@ -85,13 +90,13 @@ export default async function WorkPage(props: PageProps<"/work/[slug]">) {
               ))}
             </ul>
           </section>
-          <section className="grid gap-6 md:grid-cols-12">
+          <section className="glass grid gap-6 rounded-[2rem] p-6 sm:p-10 md:grid-cols-12">
             <h2 className="h3 md:col-span-4">How it works</h2>
             <p className="max-w-[60ch] text-lg leading-relaxed text-graphite md:col-span-8">{p.how}</p>
           </section>
         </div>
 
-        <nav aria-label="Next project" className="wrap mt-32 border-t border-line pt-10 sm:mt-40">
+        <nav aria-label="Next project" className="wrap mt-24 sm:mt-32">
           <p className="text-[0.9375rem] text-graphite">Next project</p>
           <Link
             href={`/work/${next.slug}`}
