@@ -6,35 +6,32 @@ import { finishIntro, useIntroDone } from "@/lib/intro";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const wipe = [0.76, 0, 0.24, 1] as const;
-const GREETINGS = ["Hello", "नमस्ते", "नमस्कार"];
-const GREET_MS = 720;
-const WELCOME_MS = 1500;
+const HELLO_MS = 1000;
+const WELCOME_MS = 1600;
 
-// Welcome screen: greetings flip, the welcome line rises, then the screen lifts away with a curved edge.
+// Welcome screen: "Hello", then the welcome line rises, then the screen lifts away with a curved edge.
 export default function Intro() {
   const done = useIntroDone();
   const [gone, setGone] = useState(false);
-  const [step, setStep] = useState(0); // 0..2 greetings, 3 welcome
+  const [welcome, setWelcome] = useState(false);
   const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
     if (document.documentElement.dataset.intro === "done") return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const timers: number[] = [];
-    if (reduced) {
-      timers.push(window.setTimeout(() => setStep(3), 0));
-      timers.push(window.setTimeout(() => setLeaving(true), 900));
-    } else {
-      GREETINGS.forEach((_, i) => timers.push(window.setTimeout(() => setStep(i + 1), GREET_MS * (i + 1))));
-      timers.push(window.setTimeout(() => setLeaving(true), GREET_MS * GREETINGS.length + WELCOME_MS));
-    }
+    const timers = reduced
+      ? [window.setTimeout(() => setWelcome(true), 0), window.setTimeout(() => setLeaving(true), 900)]
+      : [
+          window.setTimeout(() => setWelcome(true), HELLO_MS),
+          window.setTimeout(() => setLeaving(true), HELLO_MS + WELCOME_MS),
+        ];
     return () => timers.forEach(clearTimeout);
   }, []);
 
   // Already played this visit (and not mid-exit), or finished lifting away.
   if ((done && !leaving) || gone) return null;
 
-  const total = (GREET_MS * GREETINGS.length + WELCOME_MS) / 1000;
+  const total = (HELLO_MS + WELCOME_MS) / 1000;
 
   return (
     <motion.div
@@ -48,23 +45,20 @@ export default function Intro() {
       onAnimationStart={() => leaving && finishIntro()}
       onAnimationComplete={() => leaving && setGone(true)}
     >
-      {/* Words are stacked on top of each other and cross-fade, so none can be skipped if a timer drifts. */}
+      {/* The two lines are stacked and cross-fade. */}
       <div className="relative flex-1 px-6">
         <AnimatePresence>
-          {step < 3 ? (
+          {!welcome ? (
             <motion.p
-              key={step}
-              className="absolute inset-0 flex items-center justify-center gap-4 text-[clamp(2.5rem,8vw,5.5rem)] font-semibold tracking-[-0.03em]"
+              key="hello"
+              className="absolute inset-0 flex items-center justify-center gap-4 text-[clamp(2.75rem,9vw,6rem)] font-semibold tracking-[-0.035em]"
               initial={{ opacity: 0, y: 18, filter: "blur(6px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -18, filter: "blur(6px)" }}
-              transition={{ duration: 0.3, ease }}
-              lang={step === 0 ? "en" : step === 1 ? "hi" : "mr"}
+              transition={{ duration: 0.45, ease }}
             >
               <span className="h-3 w-3 shrink-0 rounded-full bg-[#ff7a2f]" aria-hidden />
-              <span style={{ fontFamily: step === 0 ? undefined : "var(--font-deva), var(--font-grotesk)" }}>
-                {GREETINGS[step]}
-              </span>
+              Hello
             </motion.p>
           ) : (
             <motion.div
@@ -75,7 +69,7 @@ export default function Intro() {
             >
               {[
                 { text: "Welcome to", cls: "text-[#9a9ea6]" },
-                { text: "Aviraj Patil's portfolio", cls: "" },
+                { text: "my portfolio", cls: "" },
               ].map((l, li) => (
                 <span key={l.text} className="block overflow-hidden pb-[0.12em]">
                   <motion.span

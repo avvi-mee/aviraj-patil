@@ -18,15 +18,7 @@ export default function Hero() {
   return (
     <section className="wrap grid min-h-svh items-center gap-12 pb-16 pt-24 lg:grid-cols-12 lg:gap-10 lg:pb-10">
       <div className="lg:col-span-6">
-        <motion.p className="flex items-center gap-2.5 text-[0.9375rem] text-graphite" {...rise(0.1)}>
-          <span className="relative flex h-2 w-2" aria-hidden>
-            <span className="absolute inset-0 animate-ping rounded-full bg-accent opacity-60" />
-            <span className="relative h-2 w-2 rounded-full bg-accent" />
-          </span>
-          Open to internships
-        </motion.p>
-
-        <h1 className="mt-6 text-[clamp(3.25rem,8.2vw,7rem)] font-bold leading-[0.92] tracking-[-0.055em]">
+        <h1 className="text-[clamp(3.25rem,8.2vw,7rem)] font-bold leading-[0.92] tracking-[-0.055em]">
           <SplitReveal lines={["Hi, I'm", "Aviraj."]} play={ready} delay={0.15} stagger={0.04} />
         </h1>
 
