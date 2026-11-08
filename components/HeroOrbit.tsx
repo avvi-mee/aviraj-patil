@@ -11,16 +11,19 @@ const WORDS = ["Portfolio"];
 const tiltFor = (w: number) => (w < 560 ? 0.66 : 0.38);
 const heightFor = (w: number) => w * (w < 560 ? 0.88 : 0.56);
 const RINGS = [0.2, 0.31, 0.43]; // ring radius as a share of the orbit's width
-const RING_SPEED = [0.38, 0.26, -0.17]; // radians per second; dots and planets on a ring move together
+const RING_SPEED = [0.3, 0.22, 0.16]; // radians per second for the flowing ring dots (decoration only)
+// All planets share one speed and sit 60 degrees apart on alternating rings, so they never line up or overlap.
+const PLANET_SPEED = 0.2;
+const STEP = Math.PI / 3;
 
 // Where each project orbits: ring and starting angle.
 const ORBITS: Record<string, { ring: number; phase: number }> = {
-  sukyoo: { ring: 0, phase: 0.6 },
-  katori: { ring: 1, phase: 1.9 },
-  "interior-studio-os": { ring: 1, phase: 1.9 + Math.PI },
-  "vasp-trace": { ring: 2, phase: 0.2 },
-  "peer-review-arena": { ring: 2, phase: 0.2 + Math.PI },
-  github: { ring: 0, phase: 0.6 + Math.PI },
+  "vasp-trace": { ring: 2, phase: 0 },
+  github: { ring: 0, phase: STEP },
+  "interior-studio-os": { ring: 1, phase: 2 * STEP },
+  "peer-review-arena": { ring: 2, phase: 3 * STEP },
+  sukyoo: { ring: 0, phase: 4 * STEP },
+  katori: { ring: 1, phase: 5 * STEP },
 };
 
 // Everything that orbits: the five projects, plus one planet that sends people to GitHub for the rest.
@@ -331,6 +334,16 @@ export default function HeroOrbit({ ready }: { ready: boolean }) {
       const cy = H / 2;
       const tilt = tiltFor(W);
       const size = Math.max(44, Math.min(74, W * 0.09));
+      let front = 0;
+      let best = -2;
+      PLANETS.forEach((p, i) => {
+        const o = ORBITS[p.key];
+        const sin = o ? Math.sin(o.phase + PLANET_SPEED * clock) : -2;
+        if (sin > best) {
+          best = sin;
+          front = i;
+        }
+      });
       PLANETS.forEach((p, i) => {
         const el = planetRefs.current[i];
         const label = labelRefs.current[i];
@@ -339,7 +352,7 @@ export default function HeroOrbit({ ready }: { ready: boolean }) {
         const pk = live ? Math.min(1, Math.max(0, (sinceReady - 500 - i * 140) / 1100)) : 0;
         const pl = 1 - Math.pow(1 - pk, 3);
         const R = RINGS[o.ring] * W * pl * (1 + s * 0.9);
-        const a = o.phase + RING_SPEED[o.ring] * clock;
+        const a = o.phase + PLANET_SPEED * clock;
         const depth = (Math.sin(a) + 1) / 2;
         const isHover = hoveredRef.current === p.key;
         const scale = (0.7 + 0.42 * depth) * (isHover ? 1.25 : 1) * (0.4 + 0.6 * pl);
@@ -348,7 +361,8 @@ export default function HeroOrbit({ ready }: { ready: boolean }) {
         el.style.transform = `translate3d(${cx + R * Math.cos(a) - size / 2}px, ${cy + R * Math.sin(a) * tilt - size / 2}px, 0) scale(${scale})`;
         el.style.zIndex = isHover ? "40" : depth > 0.5 ? "30" : "5";
         el.style.opacity = String((0.45 + 0.55 * depth) * (pl > 0 ? 1 : 0) * (1 - s * 0.9));
-        if (label) label.style.opacity = isHover || depth > 0.62 ? "1" : "0";
+        // Only the frontmost planet (or the hovered one) shows its name, so labels never pile up.
+        if (label) label.style.opacity = isHover || (front === i && !hoveredRef.current) ? "1" : "0";
         const tip = tipRef.current;
         if (isHover && tip) {
           const px = cx + R * Math.cos(a);
