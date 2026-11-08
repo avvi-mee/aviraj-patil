@@ -1,8 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import SplitReveal from "./SplitReveal";
-import HeroMosaic from "./HeroMosaic";
+import ParticleName from "./ParticleName";
 import { useIntroDone } from "@/lib/intro";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -16,38 +15,56 @@ export default function Hero() {
   });
 
   return (
-    <section className="wrap grid min-h-svh items-center gap-12 pb-16 pt-24 lg:grid-cols-12 lg:gap-10 lg:pb-10">
-      <div className="lg:col-span-6">
-        <h1 className="text-[clamp(3.25rem,8.2vw,7rem)] font-bold leading-[0.92] tracking-[-0.055em]">
-          <SplitReveal lines={["Hi, I'm", "Aviraj."]} play={ready} delay={0.15} stagger={0.04} />
-        </h1>
+    <section className="relative flex min-h-svh flex-col items-center justify-center px-4 pb-24 pt-28 text-center">
+      <motion.p className="glass flex items-center gap-2.5 rounded-full px-4 py-2 text-[0.875rem] text-graphite" {...rise(0.2)}>
+        <span className="h-2 w-2 rounded-full bg-accent" aria-hidden />
+        B.Tech CSE (AI &amp; ML) student in Pune
+      </motion.p>
 
-        <motion.p className="lead mt-8 max-w-[30ch]" {...rise(0.75)}>
-          I build apps, AI tools and the systems behind them, from the database to the deploy.
-        </motion.p>
-        <motion.p className="mt-4 text-[0.9375rem] text-graphite" {...rise(0.85)}>
-          B.Tech CSE (AI &amp; ML) at JSPM, Pune.
-        </motion.p>
-
-        <motion.div className="mt-10 flex flex-wrap gap-3" {...rise(1.0)}>
-          <a
-            href="#work"
-            className="inline-flex h-12 items-center rounded-full bg-accent px-6 text-[0.9375rem] font-semibold text-[#1b1d22] transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98]"
-          >
-            See my projects
-          </a>
-          <a
-            href="/resume"
-            className="inline-flex h-12 items-center rounded-full border border-line px-6 text-[0.9375rem] font-medium transition-colors duration-300 hover:border-ink"
-          >
-            View resume
-          </a>
-        </motion.div>
+      <h1 className="sr-only">Hi, I&apos;m Aviraj Patil</h1>
+      <div className="mt-6 w-full max-w-[76rem] sm:mt-8">
+        <ParticleName text="Aviraj" ready={ready} />
       </div>
 
-      <div className="mx-auto w-full max-w-[34rem] lg:col-span-6 lg:max-w-none">
-        <HeroMosaic ready={ready} />
-      </div>
+      <motion.p className="lead mt-4 max-w-[38ch] sm:mt-6" {...rise(1.0)}>
+        Hi, I&apos;m Aviraj Patil. I build apps, AI tools and the systems behind them, from the database to the deploy.
+      </motion.p>
+
+      <motion.div className="mt-9 flex flex-wrap justify-center gap-3" {...rise(1.15)}>
+        <a
+          href="#work"
+          className="inline-flex h-12 items-center rounded-full bg-accent px-6 text-[0.9375rem] font-semibold text-[#1b1d22] transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98]"
+        >
+          See my projects
+        </a>
+        <a
+          href="/resume"
+          className="glass inline-flex h-12 items-center rounded-full px-6 text-[0.9375rem] font-semibold transition-transform duration-300 hover:scale-[1.03]"
+        >
+          View resume
+        </a>
+      </motion.div>
+
+      <motion.p className="mt-6 text-[0.8125rem] text-graphite" {...rise(1.3)}>
+        <span className="hidden sm:inline">Move your cursor through my name</span>
+        <span className="sm:hidden">Drag your finger across my name</span>
+      </motion.p>
+
+      {/* Scroll cue: a small glass capsule with a dot sliding down */}
+      <motion.a
+        href="#work"
+        aria-label="Scroll to projects"
+        className="glass absolute bottom-8 left-1/2 hidden h-11 w-7 -translate-x-1/2 justify-center rounded-full pt-2 sm:flex"
+        initial={{ opacity: 0 }}
+        animate={ready ? { opacity: 1 } : {}}
+        transition={{ delay: 1.6, duration: 1 }}
+      >
+        <motion.span
+          className="h-2 w-1 rounded-full bg-accent"
+          animate={{ y: [0, 14, 0], opacity: [1, 0.2, 1] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </motion.a>
     </section>
   );
 }
