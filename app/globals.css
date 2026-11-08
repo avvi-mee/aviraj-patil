@@ -1,40 +1,23 @@
 @import "tailwindcss";
 
-/* Palette: paper, ink, graphite, line, and one accent: kesar (saffron orange).
-   --accent is for shapes and fills; --accent-ink is the darker shade used for small text. */
+/* Palette: black base, light ink, one accent: kesar (saffron orange). One theme for every visitor.
+   --accent is for shapes and fills; --accent-ink is the lighter shade used for small text. */
 :root {
-  --paper: #fafaf8;
-  --paper-2: #f2f1ee;
-  --ink: #1b1d22;
-  --graphite: #5d6168;
-  --line: #e4e5e1;
-  --accent: #f26419;
-  --accent-ink: #c2480c;
-  --accent-soft: #fde6d8;
+  color-scheme: dark;
+  --paper: #030303;
+  --paper-2: #0c0c0e;
+  --ink: #f2f2ef;
+  --graphite: #9da0a8;
+  --line: #1d1e22;
+  --accent: #ff7a2f;
+  --accent-ink: #ff9a5c;
+  --accent-soft: #2a1709;
   /* Frosted glass panels */
-  --glass-bg: rgb(255 255 255 / 0.55);
-  --glass-border: rgb(27 29 34 / 0.08);
-  --glass-hi: rgb(255 255 255 / 0.75);
-  --glass-shadow: 0 24px 60px -28px rgb(80 40 10 / 0.25);
-  --aurora-o: 0.32;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #0f1013;
-    --paper-2: #17191d;
-    --ink: #ecede9;
-    --graphite: #9a9ea6;
-    --line: #26292e;
-    --accent: #ff7a2f;
-    --accent-ink: #ff9a5c;
-    --accent-soft: #2e1c12;
-    --glass-bg: rgb(255 255 255 / 0.045);
-    --glass-border: rgb(255 255 255 / 0.09);
-    --glass-hi: rgb(255 255 255 / 0.07);
-    --glass-shadow: 0 30px 70px -30px rgb(0 0 0 / 0.6);
-    --aurora-o: 0.5;
-  }
+  --glass-bg: rgb(255 255 255 / 0.045);
+  --glass-border: rgb(255 255 255 / 0.1);
+  --glass-hi: rgb(255 255 255 / 0.09);
+  --glass-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.85);
+  --aurora-o: 0.3;
 }
 
 @theme inline {

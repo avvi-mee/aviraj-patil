@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { AnimatePresence, motion, useInView, useMotionValueEvent, useScroll, useSpring } from "motion/react";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll, useSpring } from "motion/react";
 import { projects, type Project } from "@/lib/projects";
 import Artifact from "./Artifacts";
 import { GithubIcon } from "./Icons";
@@ -31,20 +31,9 @@ function Links({ p }: { p: Project }) {
   );
 }
 
-function Stack({ p }: { p: Project }) {
-  return (
-    <ul className="flex flex-wrap gap-2" aria-label="Built with">
-      {p.stack.map((s) => (
-        <li key={s} className="chip text-graphite">
-          {s}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-// Desktop: the section pins to the screen and scrolling moves through the projects one by one.
-function Pinned() {
+// The section pins to the screen and scrolling moves through the projects one by one (phones and desktop).
+// Desktop: text on the left, drawing on the right. Phones: drawing on top, text below, progress bar above.
+export default function WorkStage() {
   const ref = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
@@ -66,11 +55,50 @@ function Pinned() {
   const p = projects[active];
 
   return (
-    <div ref={ref} className="relative hidden lg:block" style={{ height: `${n * 100}svh` }}>
+    <div ref={ref} className="relative" style={{ height: `${n * 100}svh` }}>
       <div className="sticky top-0 flex h-svh items-center">
-        <div className="wrap grid grid-cols-12 items-center gap-10">
-          <div className="col-span-5 flex flex-col gap-12">
-            <ul className="space-y-1.5 text-[0.9375rem]">
+        <div className="wrap flex w-full flex-col gap-5 pb-6 pt-20 lg:grid lg:grid-cols-12 lg:items-center lg:gap-10 lg:py-0">
+          {/* Phones: one segment per project, the current one fills */}
+          <div className="flex gap-1.5 lg:hidden" aria-hidden>
+            {projects.map((x, i) => (
+              <span key={x.slug} className="h-1 flex-1 overflow-hidden rounded-full bg-[var(--glass-border)]">
+                <span
+                  className={`block h-full rounded-full bg-accent transition-[width] duration-500 ${
+                    i < active ? "w-full opacity-50" : i === active ? "w-full" : "w-0"
+                  }`}
+                />
+              </span>
+            ))}
+          </div>
+
+          {/* Drawing: right column on desktop, top on phones */}
+          <div className="order-1 lg:order-2 lg:col-span-7">
+            <div className="glass relative mx-auto aspect-square w-full max-w-[min(100%,40svh)] overflow-hidden rounded-[2rem] lg:max-h-[76svh] lg:max-w-none lg:rounded-[2.5rem]">
+              {projects.map((x, i) => (
+                <motion.div
+                  key={x.slug}
+                  className="absolute inset-0 p-[8%]"
+                  initial={false}
+                  animate={{
+                    opacity: i === active ? 1 : 0,
+                    scale: i === active ? 1 : 0.94,
+                    filter: i === active ? "blur(0px)" : "blur(10px)",
+                  }}
+                  transition={{ duration: 0.7, ease }}
+                  aria-hidden={i !== active}
+                >
+                  <Artifact kind={x.artifact} play={i === active} />
+                </motion.div>
+              ))}
+            </div>
+            <div className="mx-auto mt-6 hidden h-px max-w-[76svh] bg-line lg:block">
+              <motion.div className="h-px origin-left bg-accent" style={{ scaleX: bar }} />
+            </div>
+          </div>
+
+          {/* Text: left column on desktop, below the drawing on phones */}
+          <div className="order-2 flex flex-col gap-12 lg:order-1 lg:col-span-5">
+            <ul className="hidden space-y-1.5 text-[0.9375rem] lg:block">
               {projects.map((x, i) => (
                 <li key={x.slug}>
                   <button
@@ -95,92 +123,38 @@ function Pinned() {
               ))}
             </ul>
 
-            <div className="relative min-h-[26rem]">
+            <div className="relative min-h-[16.5rem] lg:min-h-[26rem]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={p.slug}
-                  initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
+                  initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, y: -16, filter: "blur(8px)" }}
-                  transition={{ duration: 0.55, ease }}
+                  exit={{ opacity: 0, y: -14, filter: "blur(8px)" }}
+                  transition={{ duration: 0.5, ease }}
                 >
-                  <p className="text-[0.9375rem] text-graphite">{p.context}</p>
-                  <h3 className="mt-3 text-[clamp(2.25rem,4.2vw,3.75rem)] font-semibold leading-[0.98] tracking-[-0.035em]">
+                  <p className="text-[0.8125rem] text-graphite lg:text-[0.9375rem]">{p.context}</p>
+                  <h3 className="mt-1.5 text-[clamp(1.875rem,4.2vw,3.75rem)] font-semibold leading-[1] tracking-[-0.035em] lg:mt-3">
                     {p.name}
                   </h3>
-                  <p className="lead mt-5 max-w-[30ch]">{p.line}</p>
-                  <div className="mt-6">
-                    <Stack p={p} />
-                  </div>
-                  <div className="mt-8">
+                  <p className="mt-3 max-w-[34ch] text-[1.0625rem] leading-snug lg:mt-5 lg:max-w-[30ch] lg:text-[clamp(1.125rem,1.7vw,1.375rem)] lg:leading-normal">
+                    {p.line}
+                  </p>
+                  <ul className="mt-4 flex flex-wrap gap-1.5 lg:mt-6 lg:gap-2" aria-label="Built with">
+                    {p.stack.map((s) => (
+                      <li key={s} className="chip px-2.5 py-1 text-[0.75rem] text-graphite lg:px-3 lg:text-[0.8125rem]">
+                        {s}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-5 lg:mt-8">
                     <Links p={p} />
                   </div>
                 </motion.div>
               </AnimatePresence>
             </div>
           </div>
-
-          <div className="col-span-7">
-            <div className="glass relative mx-auto aspect-square max-h-[76svh] overflow-hidden rounded-[2.5rem]">
-              {projects.map((x, i) => (
-                <motion.div
-                  key={x.slug}
-                  className="absolute inset-0 p-[8%]"
-                  initial={false}
-                  animate={{
-                    opacity: i === active ? 1 : 0,
-                    scale: i === active ? 1 : 0.94,
-                    filter: i === active ? "blur(0px)" : "blur(10px)",
-                  }}
-                  transition={{ duration: 0.7, ease }}
-                  aria-hidden={i !== active}
-                >
-                  <Artifact kind={x.artifact} play={i === active} />
-                </motion.div>
-              ))}
-            </div>
-            <div className="mx-auto mt-6 h-px max-w-[76svh] bg-line">
-              <motion.div className="h-px origin-left bg-ink" style={{ scaleX: bar }} />
-            </div>
-          </div>
         </div>
       </div>
     </div>
-  );
-}
-
-function MobileCard({ p }: { p: Project }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const seen = useInView(ref, { amount: 0.5 });
-  return (
-    <article className="glass rounded-[2rem] p-4 pb-6">
-      <div ref={ref} className="aspect-square overflow-hidden rounded-[1.5rem] bg-[var(--glass-bg)] p-[8%]">
-        <Artifact kind={p.artifact} play={seen} />
-      </div>
-      <div className="px-2">
-        <p className="mt-6 text-[0.9375rem] text-graphite">{p.context}</p>
-        <h3 className="h3 mt-2">{p.name}</h3>
-        <p className="mt-3 text-lg leading-relaxed">{p.line}</p>
-        <div className="mt-4">
-          <Stack p={p} />
-        </div>
-      </div>
-      <div className="mt-6 px-2">
-        <Links p={p} />
-      </div>
-    </article>
-  );
-}
-
-export default function WorkStage() {
-  return (
-    <>
-      <Pinned />
-      <div className="wrap mt-10 space-y-5 lg:hidden">
-        {projects.map((p) => (
-          <MobileCard key={p.slug} p={p} />
-        ))}
-      </div>
-    </>
   );
 }

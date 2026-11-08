@@ -24,10 +24,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fafaf8" },
-    { media: "(prefers-color-scheme: dark)", color: "#0f1013" },
-  ],
+  themeColor: "#030303",
+  colorScheme: "dark",
 };
 
 // Runs before first paint: if the welcome screen already played this visit, hide it straight away.
