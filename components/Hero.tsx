@@ -26,7 +26,7 @@ export default function Hero() {
         <HeroOrbit ready={ready} />
       </div>
 
-      <motion.p className="lead relative z-10 mt-6 max-w-[38ch] sm:mt-4" {...rise(1.0)}>
+      <motion.p className="lead relative z-10 mt-12 max-w-[38ch] sm:mt-14" {...rise(1.0)}>
         Hi, I&apos;m Aviraj Patil. I build apps, AI tools and the systems behind them, from the database to the deploy.
       </motion.p>
 

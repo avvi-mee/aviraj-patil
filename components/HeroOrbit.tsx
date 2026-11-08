@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { projects, type Project } from "@/lib/projects";
 
-// The dot word in the middle morphs through these.
-const WORDS = ["Aviraj", "AI Tools", "Apps"];
+// The dot word in the middle (add more words here and it morphs between them).
+const WORDS = ["Portfolio"];
 // How flat the rings look (1 = seen from straight above). Phones get rounder rings to fill the taller screen.
 const tiltFor = (w: number) => (w < 560 ? 0.66 : 0.38);
 const heightFor = (w: number) => w * (w < 560 ? 0.88 : 0.56);
@@ -85,6 +85,7 @@ export default function HeroOrbit({ ready }: { ready: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const planetRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const labelRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const tipRef = useRef<HTMLDivElement>(null);
   const readyRef = useRef(ready);
   const readyAt = useRef(0);
   const hoveredRef = useRef<string | null>(null);
@@ -258,7 +259,8 @@ export default function HeroOrbit({ ready }: { ready: boolean }) {
           const px = d.x - pointer.x;
           const py = d.y - pointer.y;
           const p2 = px * px + py * py;
-          if (p2 < REPEL_RADIUS * REPEL_RADIUS) {
+          // While a planet is hovered the word stays still, so the card reads cleanly over it.
+          if (hoveredRef.current === null && p2 < REPEL_RADIUS * REPEL_RADIUS) {
             const dist = Math.sqrt(p2) || 1;
             const force = (1 - dist / REPEL_RADIUS) * 7 * dt;
             d.vx += (px / dist) * force;
@@ -271,7 +273,7 @@ export default function HeroOrbit({ ready }: { ready: boolean }) {
           error += Math.abs(d.hx - d.x) + Math.abs(d.hy - d.y);
         }
         // Morph once the word has fully formed and stayed readable for a moment.
-        const settled = live && sinceReady > 1500 && s < 0.05 && error / (dots.length || 1) < 1.2;
+        const settled = WORDS.length > 1 && live && sinceReady > 1500 && s < 0.05 && error / (dots.length || 1) < 1.2;
         if (!settled) settledAt = 0;
         else if (!settledAt) settledAt = now;
         else if (now - settledAt > HOLD_MS) {
@@ -318,6 +320,19 @@ export default function HeroOrbit({ ready }: { ready: boolean }) {
         el.style.zIndex = isHover ? "40" : depth > 0.5 ? "30" : "5";
         el.style.opacity = String((0.45 + 0.55 * depth) * (pl > 0 ? 1 : 0) * (1 - s * 0.9));
         if (label) label.style.opacity = isHover || depth > 0.62 ? "1" : "0";
+        const tip = tipRef.current;
+        if (isHover && tip) {
+          const px = cx + R * Math.cos(a);
+          const py = cy + R * Math.sin(a) * tilt;
+          const gapX = (size * scale) / 2 + 14;
+          const tw = tip.offsetWidth;
+          const th = tip.offsetHeight;
+          // Card goes on the side with more room, vertically centred on the planet, kept inside the orbit box.
+          let tx = px < cx ? px + gapX : px - gapX - tw;
+          tx = Math.min(Math.max(tx, 0), W - tw);
+          const ty = Math.min(Math.max(py - th / 2, 0), H - th);
+          tip.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+        }
       });
     };
 
@@ -415,20 +430,40 @@ export default function HeroOrbit({ ready }: { ready: boolean }) {
             ref={(el) => {
               labelRefs.current[i] = el;
             }}
-            className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap text-center opacity-0 transition-opacity duration-300"
+            className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap opacity-0 transition-opacity duration-300"
           >
-            <span className={`chip px-2.5 py-0.5 text-[0.7rem] font-semibold sm:text-[0.75rem] ${hovered === p.slug ? "border-accent text-ink" : "text-graphite"}`}>
+            <span
+              className={`inline-flex rounded-full border bg-[#0b0b0d] px-2.5 py-0.5 text-[0.7rem] font-semibold sm:text-[0.75rem] ${
+                hovered === p.slug ? "border-accent text-ink" : "border-[var(--glass-border)] text-graphite"
+              }`}
+            >
               {p.name}
             </span>
-            {hovered === p.slug && (
-              <span className="glass mt-2 block max-w-[15rem] whitespace-normal rounded-2xl px-3 py-2 text-[0.75rem] leading-snug text-ink">
-                {p.line}
-                <span className="mt-1 block font-semibold text-accent-ink">Open the project</span>
-              </span>
-            )}
           </span>
         </Link>
       ))}
+
+      {/* Hover card: opaque so the text behind never shows through; placed beside the hovered planet */}
+      <div
+        ref={tipRef}
+        aria-hidden
+        className={`pointer-events-none absolute left-0 top-0 z-50 w-[15rem] rounded-2xl border border-[var(--glass-border)] bg-[#0b0b0d]/95 p-4 text-left shadow-[0_24px_60px_-20px_rgb(0_0_0/0.9)] backdrop-blur-xl transition-opacity duration-200 ${
+          hovered ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        {(() => {
+          const p = projects.find((x) => x.slug === hovered);
+          if (!p) return null;
+          return (
+            <>
+              <p className="text-[0.75rem] text-graphite">{p.context}</p>
+              <p className="mt-1 text-[1rem] font-semibold tracking-tight">{p.name}</p>
+              <p className="mt-1.5 text-[0.8125rem] leading-snug text-[#d6d7d2]">{p.line}</p>
+              <p className="mt-3 text-[0.8125rem] font-semibold text-accent-ink">Click to open the project</p>
+            </>
+          );
+        })()}
+      </div>
     </div>
   );
 }
