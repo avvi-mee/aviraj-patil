@@ -4,9 +4,9 @@ import WorkStage from "@/components/WorkStage";
 import Footer from "@/components/Footer";
 
 const facts = [
-  { label: "Studying", text: "B.Tech in Computer Science (AI & ML) at JSPM, Wagholi, Pune. 2025 to 2029, now in second year." },
-  { label: "Building", text: "Products under UNMATRIX, my own studio for apps and AI tools." },
-  { label: "Looking for", text: "An internship where I can ship real features to real users." },
+  { label: "Building", text: "UNMATRIX, my startup. Katori and Interior Studio OS are our products." },
+  { label: "Studying", text: "B.Tech in Computer Science (AI & ML) at JSPM, Wagholi, Pune. Second year." },
+  { label: "Based in", text: "Pune, India." },
 ];
 
 const skills = [

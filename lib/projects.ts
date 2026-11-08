@@ -16,17 +16,18 @@ export const projects: Project[] = [
   {
     slug: "katori",
     name: "Katori",
-    line: "A calorie and fitness app that understands Indian food.",
-    context: "Fitness app",
+    line: "The all-in-one app for gym freaks: food, workouts, habits and a coach in your pocket.",
+    context: "Gym and fitness app",
     stack: ["Expo", "React Native", "TypeScript", "Supabase", "Deno"],
     github: "https://github.com/avvi-mee/katori",
     problem:
-      "Popular calorie apps don't know what a katori of rajma or two rotis with ghee is. People give up on logging because the food they actually eat isn't there.",
+      "Serious gym-goers in India juggle four apps: one for calories that doesn't know dal or roti, one for workouts, one for habits, and a WhatsApp chat with their trainer. Nothing connects, so most people stop tracking within weeks.",
     built: [
-      "Photo logging: snap a thali, confirm the dishes and portions in two or three taps.",
-      "The AI only names dishes and portions. Calories come from a reviewed Indian food table, so the numbers never depend on a model guessing.",
-      "Workout logger that works offline, habits, body tracking and a daily score.",
-      "Trainer mode where coaches review client meals, with Razorpay subscriptions and a Telegram bot.",
+      "Snap your thali and confirm portions in two taps. The AI names the dishes; calories come from a reviewed Indian food table, so the numbers are never a guess.",
+      "A workout logger that works offline in the gym, with estimated one-rep max and progression hints for every lift.",
+      "Steps and runs, habits like water, sleep and smoking, body measurements, and one daily score that rolls it all up.",
+      "Coach personas that keep you going, and a trainer mode where real coaches review client meals and bill per client.",
+      "Challenges and referrals with friends, Razorpay subscriptions and a Telegram bot for logging meals from chat.",
     ],
     how:
       "Row-level security on every database table, with automated tests that run the migrations. GitHub Actions runs type checks and tests on every push.",

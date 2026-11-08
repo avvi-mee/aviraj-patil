@@ -26,7 +26,7 @@ export default function Hero() {
           I build apps, AI tools and the systems behind them, from the database to the deploy.
         </motion.p>
         <motion.p className="mt-4 text-[0.9375rem] text-graphite" {...rise(0.85)}>
-          Second-year B.Tech CSE (AI &amp; ML) at JSPM, Pune
+          Founder of UNMATRIX. B.Tech CSE (AI &amp; ML) at JSPM, Pune.
         </motion.p>
 
         <motion.div className="mt-10 flex flex-wrap gap-3" {...rise(1.0)}>

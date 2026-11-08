@@ -55,36 +55,44 @@ function Frame({ play, label, children }: { play: boolean; label: string; childr
   );
 }
 
-// A thali seen from above, with the day's calorie ring filling around it.
+// Three daily rings (food, training, habits) filling around a dumbbell.
 function Katori({ play }: { play: boolean }) {
-  const bowls = [
-    { x: 152, y: 148, d: 0.55 },
-    { x: 250, y: 140, d: 0.68 },
-    { x: 140, y: 248, d: 0.81 },
+  const rings = [
+    { r: 138, color: accent, to: 0.82, d: 0.15, label: "Food", lx: 104 },
+    { r: 108, color: ink, to: 0.64, d: 0.35, label: "Training", lx: 188 },
+    { r: 78, color: line, to: 0.9, d: 0.55, label: "Habits", lx: 290 },
   ];
   return (
-    <Frame play={play} label="A thali with three katoris and a calorie ring filling around it">
-      <motion.circle cx="200" cy="200" r="172" stroke="var(--line)" strokeWidth="10" variants={fade(0)} />
-      <motion.circle
-        cx="200"
-        cy="200"
-        r="172"
-        stroke={accent}
-        strokeWidth="10"
-        transform="rotate(-90 200 200)"
-        variants={drawTo(0.72, 0.2, 2)}
-      />
-      <motion.circle cx="200" cy="200" r="140" stroke={ink} strokeWidth="1.5" variants={draw(0.1, 1.4)} />
-      {bowls.map((b) => (
-        <motion.g key={b.x} style={box} variants={pop(b.d)}>
-          <circle cx={b.x} cy={b.y} r="40" stroke={ink} strokeWidth="1.5" />
-          <circle cx={b.x} cy={b.y} r="30" fill={soft} />
+    <Frame play={play} label="Food, training and habit rings filling around a dumbbell">
+      {rings.map((g) => (
+        <g key={g.r}>
+          <motion.circle cx="200" cy="178" r={g.r} stroke="var(--line)" strokeWidth="18" variants={fade(0)} />
+          <motion.circle
+            cx="200"
+            cy="178"
+            r={g.r}
+            stroke={g.color}
+            strokeWidth="18"
+            transform="rotate(-90 200 178)"
+            variants={drawTo(g.to, g.d, 1.8)}
+          />
+        </g>
+      ))}
+      <motion.g style={box} variants={pop(0.9)}>
+        <line x1="168" y1="178" x2="232" y2="178" stroke={ink} strokeWidth="6" />
+        <rect x="150" y="156" width="12" height="44" rx="3" fill={ink} />
+        <rect x="238" y="156" width="12" height="44" rx="3" fill={ink} />
+        <rect x="162" y="164" width="8" height="28" rx="2" fill={accent} />
+        <rect x="230" y="164" width="8" height="28" rx="2" fill={accent} />
+      </motion.g>
+      {rings.map((g, i) => (
+        <motion.g key={g.label} variants={fade(1.2 + i * 0.12)}>
+          <circle cx={g.lx - 12} cy="361" r="5" fill={g.color} />
+          <text x={g.lx - 2} y="366" fontSize="14" fill={ink} fontFamily="inherit">
+            {g.label}
+          </text>
         </motion.g>
       ))}
-      <motion.g style={box} variants={pop(0.95)}>
-        <circle cx="252" cy="250" r="52" stroke={ink} strokeWidth="1.5" />
-        <circle cx="252" cy="250" r="40" stroke={line} strokeWidth="1" strokeDasharray="2 6" />
-      </motion.g>
     </Frame>
   );
 }

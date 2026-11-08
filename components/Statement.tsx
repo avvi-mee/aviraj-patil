@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
 
 const TEXT =
-  "Since starting college I've built a calorie tracker that understands Indian food, a tool that traces crypto for cybercrime investigators, an app for grandparents and the families who look after them, an arena where AI agents review each other's code, and the software an interior design studio runs on.";
+  "I'm the founder of UNMATRIX. I take an idea from a blank screen to a live product, and I build every layer myself.";
 
 function Word({ word, progress, range }: { word: string; progress: MotionValue<number>; range: [number, number] }) {
   const opacity = useTransform(progress, range, [0.16, 1]);
