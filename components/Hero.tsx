@@ -1,12 +1,10 @@
 "use client";
 
 import { motion } from "motion/react";
-import ParticleName from "./ParticleName";
+import HeroOrbit from "./HeroOrbit";
 import { useIntroDone } from "@/lib/intro";
 
 const ease = [0.22, 1, 0.36, 1] as const;
-// The particles morph through these, matching the line below them.
-const WORDS = ["Apps", "AI Tools", "Systems"];
 
 export default function Hero() {
   const ready = useIntroDone();
@@ -24,11 +22,11 @@ export default function Hero() {
       </motion.p>
 
       <h1 className="sr-only">Hi, I&apos;m Aviraj Patil</h1>
-      <div className="mt-6 w-full max-w-[76rem] sm:mt-8">
-        <ParticleName words={WORDS} ready={ready} />
+      <div className="mt-4 w-full sm:mt-2">
+        <HeroOrbit ready={ready} />
       </div>
 
-      <motion.p className="lead relative z-10 mt-4 max-w-[38ch] sm:mt-6" {...rise(1.0)}>
+      <motion.p className="lead relative z-10 mt-6 max-w-[38ch] sm:mt-4" {...rise(1.0)}>
         Hi, I&apos;m Aviraj Patil. I build apps, AI tools and the systems behind them, from the database to the deploy.
       </motion.p>
 
@@ -48,8 +46,8 @@ export default function Hero() {
       </motion.div>
 
       <motion.p className="mt-6 text-[0.8125rem] text-graphite" {...rise(1.3)}>
-        <span className="hidden sm:inline">Move your cursor through the words</span>
-        <span className="sm:hidden">Drag your finger across the words</span>
+        <span className="hidden sm:inline">Hover a planet to pause the orbit, click to open the project</span>
+        <span className="sm:hidden">Tap a planet to open the project</span>
       </motion.p>
 
       {/* Scroll cue: a small glass capsule with a dot sliding down */}
