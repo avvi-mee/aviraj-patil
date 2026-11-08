@@ -33,8 +33,8 @@ const fade = (delay = 0): Variants => ({
 
 const box = { transformBox: "fill-box", transformOrigin: "center" } as const;
 const ink = "var(--ink)";
-const neel = "var(--neel)";
-const soft = "var(--neel-soft)";
+const accent = "var(--accent)";
+const soft = "var(--accent-soft)";
 const line = "var(--graphite)";
 
 function Frame({ play, label, children }: { play: boolean; label: string; children: React.ReactNode }) {
@@ -69,7 +69,7 @@ function Katori({ play }: { play: boolean }) {
         cx="200"
         cy="200"
         r="172"
-        stroke={neel}
+        stroke={accent}
         strokeWidth="10"
         transform="rotate(-90 200 200)"
         variants={drawTo(0.72, 0.2, 2)}
@@ -121,7 +121,7 @@ function Vasp({ play }: { play: boolean }) {
             y1={py}
             x2={x}
             y2={y}
-            stroke={neel}
+            stroke={accent}
             strokeWidth="2"
             variants={draw(0.2 + i * 0.32, 0.45)}
           />
@@ -141,7 +141,7 @@ function Vasp({ play }: { play: boolean }) {
         />
       ))}
       <motion.g style={box} variants={pop(0)}>
-        <circle cx="72" cy="312" r="14" fill={neel} />
+        <circle cx="72" cy="312" r="14" fill={accent} />
         <text x="72" y="350" textAnchor="middle" fontSize="13" fill={ink} fontFamily="inherit">
           Wallet
         </text>
@@ -158,7 +158,7 @@ function Vasp({ play }: { play: boolean }) {
         width="56"
         height="56"
         rx="16"
-        stroke={neel}
+        stroke={accent}
         strokeWidth="1.5"
         style={box}
         variants={{
@@ -194,7 +194,7 @@ function Sukyoo({ play }: { play: boolean }) {
           variants={pop(0.45 + i * 0.1)}
         />
       ))}
-      <motion.rect x="90" y="256" width="120" height="58" rx="18" fill={neel} style={box} variants={pop(0.95)} />
+      <motion.rect x="90" y="256" width="120" height="58" rx="18" fill={accent} style={box} variants={pop(0.95)} />
       <motion.rect x="276" y="128" width="88" height="164" rx="20" stroke={ink} strokeWidth="1.5" variants={draw(0.3, 1)} />
       {[160, 184, 208, 232].map((y, i) => (
         <motion.line
@@ -210,7 +210,7 @@ function Sukyoo({ play }: { play: boolean }) {
       ))}
       <motion.path
         d="M210 285 C 245 285, 250 250, 276 250"
-        stroke={neel}
+        stroke={accent}
         strokeWidth="2"
         strokeDasharray="4 6"
         variants={draw(1.3, 0.8)}
@@ -253,7 +253,7 @@ function Arena({ play }: { play: boolean }) {
           cx={i === 4 ? 324 : 306}
           cy={86 + i * 25}
           r="7"
-          fill={neel}
+          fill={accent}
           style={box}
           variants={pop(1.05 + k * 0.18)}
         />
@@ -265,13 +265,13 @@ function Arena({ play }: { play: boolean }) {
         </text>
       </motion.g>
       <motion.g style={box} variants={pop(1.6)}>
-        <circle cx="268" cy="340" r="20" fill={neel} />
+        <circle cx="268" cy="340" r="20" fill={accent} />
         <text x="268" y="345" textAnchor="middle" fontSize="14" fontWeight="600" fill="var(--paper)" fontFamily="inherit">
           B
         </text>
       </motion.g>
       <motion.path d="M156 330 C 190 304, 210 304, 244 330" stroke={ink} strokeWidth="1.5" variants={draw(1.9, 0.7)} />
-      <motion.path d="M244 352 C 210 378, 190 378, 156 352" stroke={neel} strokeWidth="1.5" variants={draw(2.15, 0.7)} />
+      <motion.path d="M244 352 C 210 378, 190 378, 156 352" stroke={accent} strokeWidth="1.5" variants={draw(2.15, 0.7)} />
     </Frame>
   );
 }
@@ -292,10 +292,10 @@ function Interior({ play }: { play: boolean }) {
       <motion.rect x="84" y="96" width="70" height="90" rx="8" fill={soft} style={box} variants={pop(1.9)} />
       <motion.rect x="276" y="250" width="48" height="56" rx="8" fill={soft} style={box} variants={pop(2.0)} />
       <motion.circle cx="270" cy="130" r="26" fill={soft} style={box} variants={pop(2.1)} />
-      <motion.path d="M60 352 H 340 M60 344 V 360 M340 344 V 360" stroke={neel} strokeWidth="1.5" variants={draw(2.2, 0.8)} />
+      <motion.path d="M60 352 H 340 M60 344 V 360 M340 344 V 360" stroke={accent} strokeWidth="1.5" variants={draw(2.2, 0.8)} />
       <motion.g variants={fade(2.7)}>
         <rect x="150" y="338" width="100" height="28" rx="14" fill="var(--paper)" />
-        <text x="200" y="357" textAnchor="middle" fontSize="13" fill={neel} fontWeight="600" fontFamily="inherit">
+        <text x="200" y="357" textAnchor="middle" fontSize="13" fill={accent} fontWeight="600" fontFamily="inherit">
           1,240 sq ft
         </text>
       </motion.g>

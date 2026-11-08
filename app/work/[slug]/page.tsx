@@ -54,7 +54,7 @@ export default async function WorkPage(props: PageProps<"/work/[slug]">) {
               <div>
                 <dt className="text-graphite">Try it</dt>
                 <dd className="mt-1">
-                  <a href={p.live.href} target="_blank" rel="noreferrer" className="ulink text-neel">
+                  <a href={p.live.href} target="_blank" rel="noreferrer" className="ulink text-accent-ink">
                     {p.live.label}
                   </a>
                 </dd>
@@ -79,7 +79,7 @@ export default async function WorkPage(props: PageProps<"/work/[slug]">) {
             <ul className="max-w-[60ch] space-y-4 md:col-span-8">
               {p.built.map((b) => (
                 <li key={b} className="relative pl-6 text-lg leading-relaxed">
-                  <span className="absolute left-0 top-[0.7em] h-1.5 w-1.5 rounded-full bg-neel" aria-hidden />
+                  <span className="absolute left-0 top-[0.7em] h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
                   {b}
                 </li>
               ))}

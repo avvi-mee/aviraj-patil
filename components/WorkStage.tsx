@@ -11,7 +11,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
 function Links({ p }: { p: Project }) {
   return (
     <div className="flex flex-wrap gap-x-6 gap-y-2 text-[0.9375rem] font-medium">
-      <Link href={`/work/${p.slug}`} className="ulink text-neel">
+      <Link href={`/work/${p.slug}`} className="ulink text-accent-ink">
         Read the case study
       </Link>
       {p.live && (
@@ -67,7 +67,7 @@ function Pinned() {
                       {i === active && (
                         <motion.span
                           layoutId="dot"
-                          className="absolute inset-0 rounded-full bg-neel"
+                          className="absolute inset-0 rounded-full bg-accent"
                           transition={{ type: "spring", stiffness: 400, damping: 32 }}
                         />
                       )}

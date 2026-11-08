@@ -1,14 +1,16 @@
 @import "tailwindcss";
 
-/* Palette: paper, ink, graphite, line, and one accent: neel (indigo). */
+/* Palette: paper, ink, graphite, line, and one accent: kesar (saffron orange).
+   --accent is for shapes and fills; --accent-ink is the darker shade used for small text. */
 :root {
   --paper: #fafaf8;
-  --paper-2: #f1f1ee;
+  --paper-2: #f2f1ee;
   --ink: #1b1d22;
   --graphite: #5d6168;
   --line: #e4e5e1;
-  --neel: #3d4bd9;
-  --neel-soft: #e6e8fb;
+  --accent: #f26419;
+  --accent-ink: #c2480c;
+  --accent-soft: #fde6d8;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -18,8 +20,9 @@
     --ink: #ecede9;
     --graphite: #9a9ea6;
     --line: #26292e;
-    --neel: #8f98ff;
-    --neel-soft: #1d2140;
+    --accent: #ff7a2f;
+    --accent-ink: #ff9a5c;
+    --accent-soft: #2e1c12;
   }
 }
 
@@ -29,8 +32,9 @@
   --color-ink: var(--ink);
   --color-graphite: var(--graphite);
   --color-line: var(--line);
-  --color-neel: var(--neel);
-  --color-neel-soft: var(--neel-soft);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
   --font-sans: var(--font-grotesk);
 }
 
@@ -48,14 +52,22 @@ body {
 }
 
 ::selection {
-  background: var(--neel);
+  background: var(--accent);
   color: var(--paper);
 }
 
 :focus-visible {
-  outline: 2px solid var(--neel);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 6px;
+}
+
+/* Welcome screen: hidden once played; the page doesn't scroll behind it. */
+html[data-intro="done"] #intro {
+  display: none;
+}
+html:not([data-intro="done"]) {
+  overflow: hidden;
 }
 
 /* Lenis smooth scroll */

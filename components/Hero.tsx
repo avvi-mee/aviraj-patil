@@ -2,46 +2,47 @@
 
 import { motion } from "motion/react";
 import SplitReveal from "./SplitReveal";
+import HeroMosaic from "./HeroMosaic";
+import { useIntroDone } from "@/lib/intro";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
 export default function Hero() {
+  const ready = useIntroDone();
+  const rise = (delay: number) => ({
+    initial: { opacity: 0, y: 16, filter: "blur(6px)" },
+    animate: ready ? { opacity: 1, y: 0, filter: "blur(0px)" } : {},
+    transition: { delay, duration: 1, ease },
+  });
+
   return (
-    <section className="wrap flex min-h-svh flex-col justify-end pb-14 pt-28 sm:pb-20">
-      <h1 className="display">
-        <SplitReveal lines={["Aviraj", "Patil"]} />
-      </h1>
-
-      <motion.div
-        aria-hidden
-        className="mt-8 h-px origin-left bg-neel sm:mt-12"
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ delay: 0.75, duration: 1.4, ease }}
-      />
-
-      <div className="mt-8 grid gap-8 sm:mt-10 md:grid-cols-12 md:items-end">
-        <motion.p
-          className="lead max-w-[34ch] text-graphite md:col-span-7"
-          initial={{ opacity: 0, y: 14, filter: "blur(6px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ delay: 1.0, duration: 1.0, ease }}
-        >
-          Second-year B.Tech student in Computer Science (AI &amp; ML) at JSPM, Pune.{" "}
-          <span className="text-ink">I build complete products: the database, the backend, the app and the deploy.</span>
+    <section className="wrap grid min-h-svh items-center gap-12 pb-16 pt-24 lg:grid-cols-12 lg:gap-10 lg:pb-10">
+      <div className="lg:col-span-6">
+        <motion.p className="flex items-center gap-2.5 text-[0.9375rem] text-graphite" {...rise(0.1)}>
+          <span className="relative flex h-2 w-2" aria-hidden>
+            <span className="absolute inset-0 animate-ping rounded-full bg-accent opacity-60" />
+            <span className="relative h-2 w-2 rounded-full bg-accent" />
+          </span>
+          Open to internships
         </motion.p>
 
-        <motion.div
-          className="flex flex-wrap gap-3 md:col-span-5 md:justify-end"
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 1.0, ease }}
-        >
+        <h1 className="mt-6 text-[clamp(3.25rem,8.2vw,7rem)] font-bold leading-[0.92] tracking-[-0.055em]">
+          <SplitReveal lines={["Hi, I'm", "Aviraj."]} play={ready} delay={0.15} stagger={0.04} />
+        </h1>
+
+        <motion.p className="lead mt-8 max-w-[30ch]" {...rise(0.75)}>
+          I build apps, AI tools and the systems behind them, from the database to the deploy.
+        </motion.p>
+        <motion.p className="mt-4 text-[0.9375rem] text-graphite" {...rise(0.85)}>
+          Second-year B.Tech CSE (AI &amp; ML) at JSPM, Pune
+        </motion.p>
+
+        <motion.div className="mt-10 flex flex-wrap gap-3" {...rise(1.0)}>
           <a
             href="#work"
-            className="inline-flex h-12 items-center rounded-full bg-ink px-6 text-[0.9375rem] font-medium text-paper transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98]"
+            className="inline-flex h-12 items-center rounded-full bg-accent px-6 text-[0.9375rem] font-semibold text-[#1b1d22] transition-transform duration-300 hover:scale-[1.03] active:scale-[0.98]"
           >
-            See my work
+            See my projects
           </a>
           <a
             href="/aviraj-patil-resume.pdf"
@@ -51,6 +52,10 @@ export default function Hero() {
             Download resume
           </a>
         </motion.div>
+      </div>
+
+      <div className="mx-auto w-full max-w-[34rem] lg:col-span-6 lg:max-w-none">
+        <HeroMosaic ready={ready} />
       </div>
     </section>
   );

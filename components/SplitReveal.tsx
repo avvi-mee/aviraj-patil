@@ -10,11 +10,13 @@ export default function SplitReveal({
   className = "",
   delay = 0.15,
   stagger = 0.035,
+  play = true,
 }: {
   lines: string[];
   className?: string;
   delay?: number;
   stagger?: number;
+  play?: boolean;
 }) {
   let i = 0;
   return (
@@ -28,7 +30,7 @@ export default function SplitReveal({
                 key={`${line}-${d}`}
                 className="inline-block will-change-transform"
                 initial={{ y: "105%", rotate: 4 }}
-                animate={{ y: "0%", rotate: 0 }}
+                animate={play ? { y: "0%", rotate: 0 } : { y: "105%", rotate: 4 }}
                 transition={{ delay: d, duration: 1.1, ease }}
               >
                 {ch === " " ? " " : ch}

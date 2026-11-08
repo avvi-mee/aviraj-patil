@@ -3,11 +3,10 @@ import Statement from "@/components/Statement";
 import WorkStage from "@/components/WorkStage";
 import Footer from "@/components/Footer";
 
-const journey = [
-  { year: "2025", text: "Started B.Tech in Computer Science (AI & ML) at JSPM, Wagholi, Pune." },
-  { year: "2026", text: "PSBs Hackathon (IDEA 2.0): built ARIA, an AI banking assistant that works over chat, voice and SMS." },
-  { year: "2026", text: "Meta OpenEnv hackathon: built Peer Review Arena and MisInfo Arena, two reinforcement learning environments." },
-  { year: "2026", text: "Smart India Hackathon: built VASP Trace for problem statement SIH26182." },
+const facts = [
+  { label: "Studying", text: "B.Tech in Computer Science (AI & ML) at JSPM, Wagholi, Pune. 2025 to 2029, now in second year." },
+  { label: "Building", text: "Products under UNMATRIX, my own studio for apps and AI tools." },
+  { label: "Looking for", text: "An internship where I can ship real features to real users." },
 ];
 
 const skills = [
@@ -25,9 +24,9 @@ export default function Home() {
 
       <section id="work" className="scroll-mt-14 pt-24 sm:pt-36">
         <div className="wrap">
-          <h2 className="h2">Selected work</h2>
+          <h2 className="h2">My projects</h2>
           <p className="lead mt-5 max-w-[40ch] text-graphite">
-            Five projects from 2026. Scroll through them, or open one to read how it was built.
+            Scroll through them, or open one to read how it was built.
           </p>
         </div>
         <WorkStage />
@@ -48,16 +47,15 @@ export default function Home() {
 
           <div className="mt-24 grid gap-16 sm:mt-32 md:grid-cols-12">
             <div className="md:col-span-5">
-              <h2 className="h3">So far</h2>
-              <ol className="mt-8 border-l border-line">
-                {journey.map((j) => (
-                  <li key={j.text} className="relative pb-8 pl-6 last:pb-0">
-                    <span className="absolute -left-[4.5px] top-[0.45rem] h-2 w-2 rounded-full bg-neel" aria-hidden />
-                    <p className="text-[0.9375rem] font-medium">{j.year}</p>
-                    <p className="mt-1 leading-relaxed text-graphite">{j.text}</p>
-                  </li>
+              <h2 className="h3">Right now</h2>
+              <dl className="mt-8 space-y-7">
+                {facts.map((f) => (
+                  <div key={f.label} className="border-l-2 border-accent pl-5">
+                    <dt className="text-[0.9375rem] font-medium">{f.label}</dt>
+                    <dd className="mt-1 leading-relaxed text-graphite">{f.text}</dd>
+                  </div>
                 ))}
-              </ol>
+              </dl>
             </div>
 
             <div className="md:col-span-6 md:col-start-7">
