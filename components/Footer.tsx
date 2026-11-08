@@ -1,4 +1,4 @@
-import { DownloadIcon, socials } from "./Icons";
+import { socials } from "./Icons";
 
 export default function Footer() {
   return (
@@ -49,16 +49,14 @@ export default function Footer() {
             UNMATRIX
           </a>
           <a
-            href="/aviraj-patil-resume.pdf"
-            download
+            href="/resume"
             className="inline-flex h-11 items-center gap-2 rounded-full bg-accent px-5 text-[0.875rem] font-semibold text-[#1b1d22] transition-transform duration-300 hover:-translate-y-0.5"
           >
-            Download resume
-            <DownloadIcon />
+            View resume
           </a>
         </div>
       </div>
-      <p className="mt-8 px-2 text-sm text-graphite">© 2026 Aviraj Patil, founder of UNMATRIX. Pune, India.</p>
+      <p className="mt-8 px-2 text-sm text-graphite">© 2026 Aviraj Patil. Pune, India.</p>
     </footer>
   );
 }

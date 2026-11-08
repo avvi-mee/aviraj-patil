@@ -26,7 +26,7 @@ export default function Hero() {
           I build apps, AI tools and the systems behind them, from the database to the deploy.
         </motion.p>
         <motion.p className="mt-4 text-[0.9375rem] text-graphite" {...rise(0.85)}>
-          Founder of UNMATRIX. B.Tech CSE (AI &amp; ML) at JSPM, Pune.
+          B.Tech CSE (AI &amp; ML) at JSPM, Pune.
         </motion.p>
 
         <motion.div className="mt-10 flex flex-wrap gap-3" {...rise(1.0)}>
@@ -37,11 +37,10 @@ export default function Hero() {
             See my projects
           </a>
           <a
-            href="/aviraj-patil-resume.pdf"
-            download
+            href="/resume"
             className="inline-flex h-12 items-center rounded-full border border-line px-6 text-[0.9375rem] font-medium transition-colors duration-300 hover:border-ink"
           >
-            Download resume
+            View resume
           </a>
         </motion.div>
       </div>

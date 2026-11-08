@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { GithubIcon } from "@/components/Icons";
 
 const facts = [
-  { label: "Building", text: "UNMATRIX, my startup. Katori and Interior Studio OS are our products." },
+  { label: "Building", text: "Katori, a full gym app, and Interior Studio OS, software for design studios." },
   { label: "Studying", text: "B.Tech in Computer Science (AI & ML) at JSPM, Wagholi, Pune. Second year." },
   { label: "Based in", text: "Pune, India." },
 ];

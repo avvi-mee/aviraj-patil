@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 import { useIntroDone } from "@/lib/intro";
-import { DownloadIcon, socials } from "./Icons";
+import { socials } from "./Icons";
 
 const sections = [
   { label: "Projects", href: "/#work" },
@@ -56,12 +56,10 @@ export default function Nav() {
             </a>
           ))}
           <a
-            href="/aviraj-patil-resume.pdf"
-            download
+            href="/resume"
             className="ml-1.5 inline-flex h-10 items-center gap-2 rounded-full bg-accent px-4 text-[0.875rem] font-semibold text-[#1b1d22] transition-transform duration-300 hover:scale-[1.04] active:scale-[0.97]"
           >
             Resume
-            <DownloadIcon />
           </a>
         </div>
       </nav>

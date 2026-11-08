@@ -44,7 +44,7 @@ const list: [SimpleIcon, string, Level][] = [
   [siOllama, "Ollama", "Proficient"],
   [siFfmpeg, "FFmpeg", "Proficient"],
   [siDocker, "Docker", "Familiar"],
-  [siN8n, "n8n", "Familiar"],
+  [siN8n, "n8n", "Strong"],
   [siBlender, "Blender", "Familiar"],
 ];
 

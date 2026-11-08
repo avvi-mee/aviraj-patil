@@ -221,3 +221,134 @@ html.lenis body {
     transform: translate(-14vw, -16vh) scale(1.15);
   }
 }
+
+/* Resume sheet: a real A4 page. Sizes are in cqw (percent of the sheet's width),
+   so it scales on phones and prints at exactly the same layout. */
+.sheet-frame {
+  container-type: inline-size;
+  width: 100%;
+  max-width: 210mm;
+  margin-inline: auto;
+}
+.sheet {
+  width: 100%;
+  aspect-ratio: 210 / 297;
+  background: #fff;
+  color: #1b1d22;
+  border-radius: 1.25rem;
+  box-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.55), 0 0 0 1px rgb(255 255 255 / 0.08);
+  padding: 6.2cqw 6.6cqw;
+  overflow: hidden;
+  font-size: 1.5cqw;
+  line-height: 1.45;
+}
+.sheet a {
+  color: inherit;
+  text-decoration: none;
+}
+.sheet-name {
+  font-size: 5cqw;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.sheet-role {
+  margin-top: 0.9cqw;
+  font-size: 1.8cqw;
+  color: #c2480c;
+  font-weight: 600;
+}
+.sheet-contact {
+  margin-top: 1.3cqw;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4cqw 2.2cqw;
+  color: #5d6168;
+}
+.sheet section {
+  margin-top: 3cqw;
+}
+.sheet h2 {
+  font-size: 1.65cqw;
+  font-weight: 700;
+  padding-bottom: 0.6cqw;
+  margin-bottom: 1.1cqw;
+  border-bottom: 0.18cqw solid #f26419;
+}
+.sheet-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 2cqw;
+  align-items: baseline;
+}
+.sheet-row > p:last-child {
+  text-align: right;
+  flex-shrink: 0;
+  max-width: 40%;
+}
+.sheet-muted {
+  color: #5d6168;
+}
+.sheet-projects {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6cqw;
+}
+.sheet-projects ul {
+  margin-top: 0.4cqw;
+  padding-left: 2.2cqw;
+  list-style: disc;
+}
+.sheet-projects li {
+  margin-top: 0.2cqw;
+}
+.sheet-projects li::marker {
+  color: #f26419;
+}
+.sheet-also {
+  margin-top: 1.4cqw;
+  color: #5d6168;
+}
+.sheet-skills > div {
+  display: grid;
+  grid-template-columns: 22% 1fr;
+  gap: 2cqw;
+  padding: 0.25cqw 0;
+}
+.sheet-skills dt {
+  font-weight: 600;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  html,
+  body {
+    background: #fff !important;
+    overflow: visible !important;
+  }
+  #intro,
+  header:has(nav),
+  .no-print {
+    display: none !important;
+  }
+  .sheet-wrap {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+  .sheet-frame {
+    max-width: none !important;
+    width: 210mm !important;
+  }
+  .sheet {
+    width: 210mm !important;
+    height: 297mm !important;
+    max-width: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
