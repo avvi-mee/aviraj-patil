@@ -15,7 +15,7 @@ export default function Hero() {
   });
 
   return (
-    <section className="relative flex min-h-svh flex-col items-center justify-center px-4 pb-24 pt-28 text-center">
+    <section className="relative flex min-h-svh flex-col items-center justify-center overflow-x-clip px-4 pb-24 pt-28 text-center">
       <motion.p className="glass relative z-10 flex items-center gap-2.5 rounded-full px-4 py-2 text-[0.875rem] text-graphite" {...rise(0.2)}>
         <span className="h-2 w-2 rounded-full bg-accent" aria-hidden />
         B.Tech CSE (AI &amp; ML) student in Pune

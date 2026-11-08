@@ -2,23 +2,31 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { motion } from "motion/react";
 import { projects, type Project } from "@/lib/projects";
 
-const ease = [0.22, 1, 0.36, 1] as const;
+// The dot word in the middle morphs through these.
+const WORDS = ["Aviraj", "AI Tools", "Apps"];
 // How flat the rings look (1 = seen from straight above). Phones get rounder rings to fill the taller screen.
 const tiltFor = (w: number) => (w < 560 ? 0.66 : 0.38);
 const heightFor = (w: number) => w * (w < 560 ? 0.88 : 0.56);
 const RINGS = [0.2, 0.31, 0.43]; // ring radius as a share of the orbit's width
+const RING_SPEED = [0.38, 0.26, -0.17]; // radians per second; dots and planets on a ring move together
 
-// Where each project orbits: ring, starting angle, speed (radians per second; negative = other way).
-const ORBITS: Record<string, { ring: number; phase: number; speed: number }> = {
-  sukyoo: { ring: 0, phase: 0.6, speed: 0.38 },
-  katori: { ring: 1, phase: 1.9, speed: 0.26 },
-  "interior-studio-os": { ring: 1, phase: 1.9 + Math.PI, speed: 0.26 },
-  "vasp-trace": { ring: 2, phase: 0.2, speed: -0.17 },
-  "peer-review-arena": { ring: 2, phase: 0.2 + Math.PI, speed: -0.17 },
+// Where each project orbits: ring and starting angle.
+const ORBITS: Record<string, { ring: number; phase: number }> = {
+  sukyoo: { ring: 0, phase: 0.6 },
+  katori: { ring: 1, phase: 1.9 },
+  "interior-studio-os": { ring: 1, phase: 1.9 + Math.PI },
+  "vasp-trace": { ring: 2, phase: 0.2 },
+  "peer-review-arena": { ring: 2, phase: 0.2 + Math.PI },
 };
+
+const SPRING = 0.07;
+const FRICTION = 0.82;
+const REPEL_RADIUS = 100;
+const HOLD_MS = 2200; // how long a fully formed word stays before morphing
+
+type Dot = { x: number; y: number; hx: number; hy: number; vx: number; vy: number; accent: boolean; delay: number; sx: number; sy: number };
 
 // Small line icons, one per project.
 function PlanetIcon({ kind }: { kind: Project["artifact"] }) {
@@ -69,17 +77,18 @@ function PlanetIcon({ kind }: { kind: Project["artifact"] }) {
   }
 }
 
-// Five projects orbiting a glowing core. Hover (or touch) pauses them; click opens the project.
-// The orbit launches when the intro ends, and speeds up, spreads and fades as you scroll away.
+// Everything in dots: a particle word in the middle that morphs (Aviraj, AI Tools, Apps), rings of
+// flowing dots around it, and the five projects orbiting as glass planets you can hover and click.
+// It launches when the intro ends and blows apart as you scroll away.
 export default function HeroOrbit({ ready }: { ready: boolean }) {
   const boxRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const planetRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const labelRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const readyRef = useRef(ready);
   const readyAt = useRef(0);
   const hoveredRef = useRef<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
-  const [width, setWidth] = useState(0);
 
   useEffect(() => {
     readyRef.current = ready;
@@ -92,52 +101,222 @@ export default function HeroOrbit({ ready }: { ready: boolean }) {
 
   useEffect(() => {
     const box = boxRef.current;
-    if (!box) return;
-    const setWidthSafe = (w: number) => requestAnimationFrame(() => setWidth(w));
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!box || !canvas || !ctx) return;
+
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let W = box.clientWidth;
-    setWidthSafe(W);
+    const css = getComputedStyle(document.documentElement);
+    const accent = css.getPropertyValue("--accent").trim() || "#ff7a2f";
+    const ink = css.getPropertyValue("--ink").trim() || "#f2f2ef";
+
+    let W = 0; // orbit box width
+    let H = 0; // orbit box height
+    let CH = 0; // canvas height: the box plus 25% above and below, so scattering dots aren't cut off
+    let dots: Dot[] = [];
+    let wordHomes: [number, number][][] = [];
+    let ringDots: number[][] = []; // per ring: the base angle of each dot
+    let wordIndex = 0;
+    let settledAt = 0;
+    let dot = 2;
     let frame = 0;
     let last = performance.now();
-    let clock = 0; // orbit time, slowed or stopped while paused
+    let clock = 0;
     let speed = 1;
     let touchHold = 0;
+    let onScreen = true;
+    const pointer = { x: -9999, y: -9999 };
 
-    const ro = new ResizeObserver(() => {
+    const target = (i: number) => {
+      const homes = wordHomes[i];
+      if (!homes?.length) return;
+      dots.forEach((d, k) => {
+        const [hx, hy] = homes[Math.floor((k * homes.length) / dots.length)];
+        d.hx = hx;
+        d.hy = hy;
+      });
+    };
+
+    const build = async () => {
+      await document.fonts.ready;
       W = box.clientWidth;
-      setWidthSafe(W);
-    });
-    ro.observe(box);
+      H = heightFor(W);
+      CH = H * 1.5;
+      if (!W) return;
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      canvas.width = W * dpr;
+      canvas.height = CH * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const place = (now: number) => {
-      const cx = W / 2;
-      const cy = heightFor(W) / 2;
+      // Sample each word into dot positions (same size for all, set by the widest word).
+      const off = document.createElement("canvas");
+      off.width = Math.ceil(W);
+      off.height = Math.ceil(CH);
+      const o = off.getContext("2d", { willReadFrequently: true });
+      if (!o) return;
+      const family = getComputedStyle(canvas).fontFamily;
+      let size = H * 0.34;
+      o.font = `700 ${size}px ${family}`;
+      const widest = Math.max(...WORDS.map((w) => o.measureText(w).width));
+      if (widest > W * 0.58) size *= (W * 0.58) / widest;
+      const gap = W < 560 ? 3 : 4;
+      dot = W < 560 ? 1.7 : 2.2;
+      wordHomes = WORDS.map((w) => {
+        o.clearRect(0, 0, off.width, off.height);
+        o.font = `700 ${size}px ${family}`;
+        o.textAlign = "center";
+        o.textBaseline = "middle";
+        o.fillText(w, W / 2, CH / 2);
+        const data = o.getImageData(0, 0, off.width, off.height).data;
+        const homes: [number, number][] = [];
+        for (let x = 0; x < off.width; x += gap) {
+          for (let y = 0; y < off.height; y += gap) {
+            if (data[(y * off.width + x) * 4 + 3] > 140) homes.push([x, y]);
+          }
+        }
+        return homes;
+      });
+
+      const count = Math.max(...wordHomes.map((h) => h.length));
+      const prev = dots;
+      dots = Array.from({ length: count }, (_, k) => {
+        const old = prev[k];
+        const angle = Math.random() * Math.PI * 2;
+        const reach = 0.45 + Math.random() * 0.9;
+        return {
+          hx: 0,
+          hy: 0,
+          x: old ? old.x : W / 2 + (Math.random() - 0.5) * 40,
+          y: old ? old.y : CH / 2 + (Math.random() - 0.5) * 40,
+          vx: 0,
+          vy: 0,
+          accent: Math.random() < 0.24,
+          delay: 300 + (k / count) * 600 + Math.random() * 200,
+          sx: Math.cos(angle) * reach,
+          sy: Math.sin(angle) * reach - 0.6,
+        };
+      });
+      target(wordIndex);
+
+      // Rings: dots spaced evenly along each ellipse.
       const tilt = tiltFor(W);
-      const size = Math.max(44, Math.min(76, W * 0.1));
-      const s = reduced ? 0 : Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.6)));
-      box.style.opacity = String(1 - s * 0.9);
+      const spacing = W < 560 ? 6 : 7;
+      ringDots = RINGS.map((r) => {
+        const R = r * W;
+        const perimeter = 2 * Math.PI * Math.sqrt((R * R + (R * tilt) ** 2) / 2);
+        const n = Math.floor(perimeter / spacing);
+        return Array.from({ length: n }, (_, i) => (i / n) * Math.PI * 2);
+      });
 
+      if (reduced) {
+        dots.forEach((d) => {
+          d.x = d.hx;
+          d.y = d.hy;
+        });
+        render(performance.now(), 0);
+      }
+    };
+
+    const drawRing = (front: boolean, s: number, launch: number) => {
+      const cx = W / 2;
+      const cy = CH / 2;
+      const tilt = tiltFor(W);
+      ringDots.forEach((angles, r) => {
+        const R = RINGS[r] * W * (1 + s * 0.9);
+        const shown = Math.floor(angles.length * launch);
+        for (let i = 0; i < shown; i++) {
+          const a = angles[i] + RING_SPEED[r] * clock;
+          const sin = Math.sin(a);
+          if (sin > 0 !== front) continue;
+          const depth = (sin + 1) / 2;
+          ctx.globalAlpha = (front ? 0.22 + 0.5 * depth : 0.08 + 0.18 * depth) * (1 - s);
+          ctx.fillStyle = i % 9 === 0 ? accent : ink;
+          ctx.fillRect(cx + R * Math.cos(a), cy + R * sin * tilt, 1.6, 1.6);
+        }
+      });
+      ctx.globalAlpha = 1;
+    };
+
+    // Draw one frame and place the planets.
+    const render = (now: number, dt: number) => {
+      const live = reduced || readyRef.current;
+      const sinceReady = reduced ? 9999 : now - readyAt.current;
+      const s = reduced ? 0 : Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.6)));
+      const k = live ? Math.min(1, Math.max(0, (sinceReady - 150) / 1400)) : 0;
+      const launch = 1 - Math.pow(1 - k, 3);
+
+      // Word dots: spring to their letter, get pushed by the pointer, blow apart on scroll.
+      const spread = Math.max(W, CH) * 0.75 * s * s;
+      const damp = Math.pow(FRICTION, dt);
+      let error = 0;
+      if (!reduced) {
+        for (const d of dots) {
+          if (live && sinceReady > d.delay) {
+            d.vx += (d.hx + d.sx * spread - d.x) * SPRING * dt;
+            d.vy += (d.hy + d.sy * spread - d.y) * SPRING * dt;
+          }
+          const px = d.x - pointer.x;
+          const py = d.y - pointer.y;
+          const p2 = px * px + py * py;
+          if (p2 < REPEL_RADIUS * REPEL_RADIUS) {
+            const dist = Math.sqrt(p2) || 1;
+            const force = (1 - dist / REPEL_RADIUS) * 7 * dt;
+            d.vx += (px / dist) * force;
+            d.vy += (py / dist) * force;
+          }
+          d.vx *= damp;
+          d.vy *= damp;
+          d.x += d.vx * dt;
+          d.y += d.vy * dt;
+          error += Math.abs(d.hx - d.x) + Math.abs(d.hy - d.y);
+        }
+        // Morph once the word has fully formed and stayed readable for a moment.
+        const settled = live && sinceReady > 1500 && s < 0.05 && error / (dots.length || 1) < 1.2;
+        if (!settled) settledAt = 0;
+        else if (!settledAt) settledAt = now;
+        else if (now - settledAt > HOLD_MS) {
+          settledAt = 0;
+          wordIndex = (wordIndex + 1) % WORDS.length;
+          target(wordIndex);
+          for (const d of dots) {
+            d.vx += (Math.random() - 0.5) * 2.5;
+            d.vy += (Math.random() - 0.5) * 2.5;
+          }
+        }
+      }
+
+      ctx.clearRect(0, 0, W, CH);
+      drawRing(false, s, launch); // back half of the rings, behind the word
+      ctx.globalAlpha = live ? 1 - s * 0.95 : 0;
+      for (const pass of [false, true]) {
+        ctx.fillStyle = pass ? accent : ink;
+        for (const d of dots) if (d.accent === pass) ctx.fillRect(d.x, d.y, dot, dot);
+      }
+      ctx.globalAlpha = 1;
+      drawRing(true, s, launch); // front half, over the word
+
+      // Planets ride the rings: bigger and on top in front, smaller and behind the word at the back.
+      const cx = W / 2;
+      const cy = H / 2;
+      const tilt = tiltFor(W);
+      const size = Math.max(44, Math.min(74, W * 0.09));
       projects.forEach((p, i) => {
         const el = planetRefs.current[i];
         const label = labelRefs.current[i];
         const o = ORBITS[p.slug];
         if (!el || !o) return;
-        // Launch from the core one after another once the intro is done.
-        const since = readyRef.current ? (now - readyAt.current) / 1000 - 0.25 - i * 0.14 : -1;
-        const k = reduced ? 1 : Math.min(1, Math.max(0, since / 1.1));
-        const launch = k === 0 ? 0 : 1 - Math.pow(1 - k, 3);
-        const R = RINGS[o.ring] * W * launch * (1 + s * 0.9);
-        const a = o.phase + o.speed * clock;
-        const x = cx + R * Math.cos(a);
-        const y = cy + R * Math.sin(a) * tilt;
-        const depth = (Math.sin(a) + 1) / 2; // 1 = in front of the core, 0 = behind it
+        const pk = live ? Math.min(1, Math.max(0, (sinceReady - 500 - i * 140) / 1100)) : 0;
+        const pl = 1 - Math.pow(1 - pk, 3);
+        const R = RINGS[o.ring] * W * pl * (1 + s * 0.9);
+        const a = o.phase + RING_SPEED[o.ring] * clock;
+        const depth = (Math.sin(a) + 1) / 2;
         const isHover = hoveredRef.current === p.slug;
-        const scale = (0.7 + 0.42 * depth) * (isHover ? 1.25 : 1) * (0.4 + 0.6 * launch);
+        const scale = (0.7 + 0.42 * depth) * (isHover ? 1.25 : 1) * (0.4 + 0.6 * pl);
         el.style.width = `${size}px`;
         el.style.height = `${size}px`;
-        el.style.transform = `translate3d(${x - size / 2}px, ${y - size / 2}px, 0) scale(${scale})`;
-        el.style.zIndex = isHover ? "40" : depth > 0.5 ? "30" : "10";
-        el.style.opacity = String((0.45 + 0.55 * depth) * (launch > 0 ? 1 : 0));
+        el.style.transform = `translate3d(${cx + R * Math.cos(a) - size / 2}px, ${cy + R * Math.sin(a) * tilt - size / 2}px, 0) scale(${scale})`;
+        el.style.zIndex = isHover ? "40" : depth > 0.5 ? "30" : "5";
+        el.style.opacity = String((0.45 + 0.55 * depth) * (pl > 0 ? 1 : 0) * (1 - s * 0.9));
         if (label) label.style.opacity = isHover || depth > 0.62 ? "1" : "0";
       });
     };
@@ -145,23 +324,40 @@ export default function HeroOrbit({ ready }: { ready: boolean }) {
     const step = () => {
       frame = requestAnimationFrame(step);
       const now = performance.now();
-      const dt = Math.min(0.05, (now - last) / 1000);
+      const dt = Math.min(3, (now - last) / 16.67); // in 60 fps frames, so slow devices move at the same speed
       last = now;
+      if (!onScreen) return;
       const s = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.6)));
       const paused = hoveredRef.current !== null || now < touchHold;
-      const target = paused ? 0 : 1 + s * 5; // spins faster as you scroll away
-      speed += (target - speed) * Math.min(1, dt * 4);
-      clock += dt * speed;
-      place(now);
+      const goal = paused ? 0 : 1 + s * 5; // spins faster as you scroll away
+      speed += (goal - speed) * Math.min(1, dt * 0.07);
+      clock += (dt / 60) * speed;
+      render(now, dt);
     };
 
+    const move = (e: PointerEvent) => {
+      const r = canvas.getBoundingClientRect();
+      pointer.x = e.clientX - r.left;
+      pointer.y = e.clientY - r.top;
+    };
+    const leave = () => {
+      pointer.x = -9999;
+      pointer.y = -9999;
+    };
     // Touching the orbit on a phone pauses it for a moment so a planet is easy to tap.
     const onTouch = () => (touchHold = performance.now() + 2500);
+
+    build();
+    let resizeTimer = 0;
+    const ro = new ResizeObserver(() => {
+      clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(build, 150);
+    });
+    ro.observe(box);
     box.addEventListener("pointerdown", onTouch);
 
     if (reduced) {
-      place(performance.now());
-      const onReady = () => place(performance.now());
+      const onReady = () => render(performance.now(), 0);
       window.addEventListener("intro:done", onReady);
       return () => {
         ro.disconnect();
@@ -169,52 +365,35 @@ export default function HeroOrbit({ ready }: { ready: boolean }) {
         window.removeEventListener("intro:done", onReady);
       };
     }
+
+    const io = new IntersectionObserver(([entry]) => (onScreen = entry.isIntersecting));
+    io.observe(box);
+    window.addEventListener("pointermove", move);
+    document.addEventListener("pointerleave", leave);
+    window.addEventListener("blur", leave);
     frame = requestAnimationFrame(step);
     return () => {
       cancelAnimationFrame(frame);
+      clearTimeout(resizeTimer);
       ro.disconnect();
+      io.disconnect();
       box.removeEventListener("pointerdown", onTouch);
+      window.removeEventListener("pointermove", move);
+      document.removeEventListener("pointerleave", leave);
+      window.removeEventListener("blur", leave);
     };
   }, []);
 
   return (
-    <div ref={boxRef} className="relative mx-auto aspect-[1/0.88] w-full max-w-[min(92vw,820px,118svh)] min-[560px]:aspect-[1/0.56]">
-      {/* Rings */}
-      {width > 0 && (
-        <svg className="absolute inset-0 h-full w-full overflow-visible" viewBox={`0 0 ${width} ${heightFor(width)}`} aria-hidden>
-          {RINGS.map((r, i) => (
-            <motion.ellipse
-              key={r}
-              cx={width / 2}
-              cy={heightFor(width) / 2}
-              rx={r * width}
-              ry={r * width * tiltFor(width)}
-              fill="none"
-              stroke="rgb(255 255 255 / 0.12)"
-              strokeWidth="1"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={ready ? { pathLength: 1, opacity: 1 } : {}}
-              transition={{ delay: 0.1 + i * 0.15, duration: 1.4, ease }}
-            />
-          ))}
-        </svg>
-      )}
+    <div ref={boxRef} className="relative mx-auto aspect-[1/0.88] w-full max-w-[min(92vw,860px,120svh)] min-[560px]:aspect-[1/0.56]">
+      {/* Soft warm light behind the word */}
+      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent opacity-[0.1] blur-3xl" />
+      <canvas
+        ref={canvasRef}
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 -top-1/4 z-10 h-[150%] w-full select-none font-sans"
+      />
 
-      {/* Core */}
-      <motion.div
-        className="absolute left-1/2 top-1/2 z-20 flex aspect-square w-[19%] min-w-[78px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
-        style={{
-          background: "radial-gradient(circle at 35% 30%, #ffd1a8 0%, #ff8a3d 38%, #e2531a 70%, #9a2f0c 100%)",
-          boxShadow: "0 0 60px 8px rgb(255 122 47 / 0.45), 0 0 140px 40px rgb(255 122 47 / 0.18), inset 0 -10px 30px rgb(0 0 0 / 0.35)",
-        }}
-        initial={{ scale: 0.6, opacity: 0 }}
-        animate={ready ? { scale: [0.6, 1.08, 1], opacity: 1 } : {}}
-        transition={{ duration: 1.1, ease }}
-      >
-        <span className="text-[clamp(0.75rem,1.9vw,1.25rem)] font-bold tracking-[-0.03em] text-[#1b1d22]">Portfolio</span>
-      </motion.div>
-
-      {/* Planets */}
       {projects.map((p, i) => (
         <Link
           key={p.slug}

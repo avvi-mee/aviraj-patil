@@ -4,7 +4,7 @@
    --accent is for shapes and fills; --accent-ink is the lighter shade used for small text. */
 :root {
   color-scheme: dark;
-  --paper: #030303;
+  --paper: #000000;
   --paper-2: #0c0c0e;
   --ink: #f2f2ef;
   --graphite: #9da0a8;
@@ -17,7 +17,7 @@
   --glass-border: rgb(255 255 255 / 0.1);
   --glass-hi: rgb(255 255 255 / 0.09);
   --glass-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.85);
-  --aurora-o: 0.3;
+  --aurora-o: 0.13;
 }
 
 @theme inline {
@@ -39,6 +39,7 @@ html {
 }
 
 body {
+  overflow-x: clip; /* orbit labels near the edge must never cause sideways scrolling */
   color: var(--ink);
   font-family: var(--font-grotesk), system-ui, sans-serif;
   text-rendering: optimizeLegibility;
